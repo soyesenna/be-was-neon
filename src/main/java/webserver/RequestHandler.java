@@ -60,6 +60,8 @@ public class RequestHandler implements Runnable {
         }
 
         logger.info("Request Read Done");
+        logger.info(httpRequest.toString());
         return httpRequest.toString();
     }
 }
+

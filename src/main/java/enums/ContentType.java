@@ -5,7 +5,8 @@ public enum ContentType {
     HTML("text/html;charset=utf-8"),
     CSS("text/css"),
     SVG("image/svg+xml"),
-    PNG("image/png");
+    PNG("image/png"),
+    ICO("image/x-icon");
 
     private String type;
 

@@ -30,7 +30,7 @@ public class HTTPParser {
 
     /**
      * http method와 내용 파싱
-     * @param String
+     * @param request
      * @return
      * @throws IOException
      */
@@ -63,7 +63,7 @@ public class HTTPParser {
     private List<String> getTokenizeHTTP(String request)throws IOException{
         List<String> tokenizeResult = new ArrayList<>();
 
-        StringTokenizer st = new StringTokenizer(request, " \r");
+        StringTokenizer st = new StringTokenizer(request, " ");
 
         while (st.hasMoreTokens()) tokenizeResult.add(st.nextToken());
 
