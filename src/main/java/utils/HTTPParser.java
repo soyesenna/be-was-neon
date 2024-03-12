@@ -13,7 +13,7 @@ import java.util.StringTokenizer;
 import java.util.stream.Stream;
 
 public class HTTPParser {
-
+    private static final String DEFAULT_URL = "/index.html";
     private static final Logger logger = LoggerFactory.getLogger(HTTPParser.class);
     private static final HTTPParser instance = new HTTPParser();
 
@@ -46,7 +46,8 @@ public class HTTPParser {
                 ContentType contentType = ContentType.valueOf(splitRequest.get(URL_INDEX).split("\\.")[1].toUpperCase());
                 result = new ParsedHttpRequest(methods, splitRequest.get(URL_INDEX), contentType);
             } catch (IndexOutOfBoundsException notFile) {
-                result = new ParsedHttpRequest(methods);
+                String url = splitRequest.get(URL_INDEX) + DEFAULT_URL;
+                result = new ParsedHttpRequest(methods, url, ContentType.HTML);
             }
 
         } catch (IllegalArgumentException e) {

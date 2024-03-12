@@ -5,8 +5,6 @@ import enums.HTTPMethods;
 
 public class ParsedHttpRequest {
 
-    private static final String DEFAULT_URL = "index.html";
-
     private final HTTPMethods methods;
     private final String URL;
     private final ContentType contentType;
@@ -16,13 +14,6 @@ public class ParsedHttpRequest {
         this.methods = methods;
         this.URL = url;
         this.contentType = contentType;
-        this.isSuccess = true;
-    }
-
-    public ParsedHttpRequest(HTTPMethods methods) {
-        this.methods = methods;
-        this.URL = DEFAULT_URL;
-        this.contentType = ContentType.HTML;
         this.isSuccess = true;
     }
 
