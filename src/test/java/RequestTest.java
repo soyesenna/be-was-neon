@@ -1,5 +1,6 @@
 import Data.ParsedHttpRequest;
 import enums.ContentType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import utils.HTTPParser;
@@ -9,6 +10,12 @@ import java.io.IOException;
 
 public class RequestTest {
 
+    private HTTPParser parser;
+    @BeforeEach
+    void before() {
+        parser = HTTPParser.getInstance();
+    }
+
     @Test
     @DisplayName("URL에 파일이 지정되어 있지 않을때 index.html반환해야함")
     void returnIndexIfNoFile() {
@@ -16,9 +23,6 @@ public class RequestTest {
                 "Host: localhost:8080\n" +
                 "Connection: keep-alive\n" +
                 "Accept: */*";
-
-        HTTPParser parser = HTTPParser.getInstance();
-
         try {
             ParsedHttpRequest parsedHttpRequest = parser.getParsedHTTP(url);
             assertThat(parsedHttpRequest.getURL()).isEqualTo("/register/index.html");

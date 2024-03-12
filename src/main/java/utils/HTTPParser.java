@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 
 public class HTTPParser {
     private static final String DEFAULT_URL = "/index.html";
+    private static final String FILE_SYMBOL = ".";
+    private static final String QUERY_SYMBOL = "?";
     private static final Logger logger = LoggerFactory.getLogger(HTTPParser.class);
     private static final HTTPParser instance = new HTTPParser();
 
@@ -37,15 +39,23 @@ public class HTTPParser {
     public ParsedHttpRequest getParsedHTTP(String request) throws IOException{
         List<String> splitRequest = getTokenizeHTTP(request);
 
+        //유효하지 않은 http request일 경우 리턴될 객체
+        //isSuccess == false임
         ParsedHttpRequest result = new ParsedHttpRequest();
         try {
             //유효한 http메서드인지 검사함
             HTTPMethods methods = HTTPMethods.valueOf(splitRequest.get(METHOD_INDEX));
-            //유효한 content-type인지 검사함
-            try {
+
+            if (splitRequest.get(URL_INDEX).contains(QUERY_SYMBOL)) {
+                //쿼리 파싱
+                result = new ParsedHttpRequest(methods, splitRequest.get(URL_INDEX), ContentType.QUERY);
+            } else if (splitRequest.get(URL_INDEX).contains(FILE_SYMBOL)) {
+                //content-type 파싱 :: 파일을 요청한경우
                 ContentType contentType = ContentType.valueOf(splitRequest.get(URL_INDEX).split("\\.")[1].toUpperCase());
                 result = new ParsedHttpRequest(methods, splitRequest.get(URL_INDEX), contentType);
-            } catch (IndexOutOfBoundsException notFile) {
+
+            }else {
+                //file, query가 아닌 기본 url일 경우 index.html 매핑
                 String url = splitRequest.get(URL_INDEX) + DEFAULT_URL;
                 result = new ParsedHttpRequest(methods, url, ContentType.HTML);
             }
@@ -67,7 +77,7 @@ public class HTTPParser {
 
         while (st.hasMoreTokens()) tokenizeResult.add(st.nextToken());
 
-        logger.info( "Request Tokenize Done");
+        logger.info("Request Tokenize Done");
         return tokenizeResult;
     }
 
