@@ -46,7 +46,7 @@ public class HTTPParser {
                 ContentType contentType = ContentType.valueOf(splitRequest.get(URL_INDEX).split("\\.")[1].toUpperCase());
                 result = new ParsedHttpRequest(methods, splitRequest.get(URL_INDEX), contentType);
             } catch (IndexOutOfBoundsException notFile) {
-                result = new ParsedHttpRequest(methods, splitRequest.get(URL_INDEX), ContentType.NONE);
+                result = new ParsedHttpRequest(methods);
             }
 
         } catch (IllegalArgumentException e) {
