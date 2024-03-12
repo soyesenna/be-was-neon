@@ -1,4 +1,4 @@
-package DTO;
+package Data;
 
 import enums.ContentType;
 import enums.HTTPMethods;
