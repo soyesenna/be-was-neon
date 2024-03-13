@@ -1,17 +1,18 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
+import Data.ParsedHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.HTTPParser;
+import utils.Paths;
+
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
+    private final HTTPParser parser = HTTPParser.getInstance();
     private Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
@@ -25,31 +26,40 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+
+            //파싱된 http request를 DTO로 저장
+            ParsedHttpRequest parsedHttpRequest = parser.getParsedHTTP(readHttpRequest(new BufferedReader(new InputStreamReader(in))));
+
+            if (parsedHttpRequest.isSuccess()) {
+                ResponseHandler response = new ResponseHandler(this.parser);
+                switch (parsedHttpRequest.getMethods()) {
+                    case GET -> {
+                        logger.info("HTTP METHOD -> GET");
+                        logger.debug("Request URL -> {}", parsedHttpRequest.getURL());
+                        response.responseGetMethod(Paths.STATIC_RESOURCES + parsedHttpRequest.getURL(), parsedHttpRequest.getContentType(), dos);
+                    }
+                }
+            } else {
+                logger.error("CAN NOT Parsing Request!!");
+            }
+
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
+    private String readHttpRequest(final BufferedReader bufferedReader) throws IOException {
+        StringBuilder httpRequest = new StringBuilder();
 
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            httpRequest.append(line);
+            if (line.isEmpty()) {
+                break;
+            }
         }
+
+        logger.info("Request Read Done");
+        return httpRequest.toString();
     }
 }
