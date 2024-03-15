@@ -7,7 +7,6 @@ import Data.ParsedHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.HTTPParser;
-import utils.Paths;
 
 
 public class RequestHandler implements Runnable {
@@ -27,16 +26,16 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
 
-            //파싱된 http request를 DTO로 저장
+            //파싱된 http request를 저장
             ParsedHttpRequest parsedHttpRequest = parser.getParsedHTTP(readHttpRequest(new BufferedReader(new InputStreamReader(in))));
 
             if (parsedHttpRequest.isSuccess()) {
-                ResponseHandler response = new ResponseHandler(this.parser);
+                ResponseHandler response = new ResponseHandler(this.parser, parsedHttpRequest, dos);
                 switch (parsedHttpRequest.getMethods()) {
                     case GET -> {
                         logger.info("HTTP METHOD -> GET");
                         logger.debug("Request URL -> {}", parsedHttpRequest.getURL());
-                        response.responseGetMethod(Paths.STATIC_RESOURCES + parsedHttpRequest.getURL(), parsedHttpRequest.getContentType(), dos);
+                        response.responseGetMethod();
                     }
                 }
             } else {
@@ -58,8 +57,8 @@ public class RequestHandler implements Runnable {
                 break;
             }
         }
-
         logger.info("Request Read Done");
         return httpRequest.toString();
     }
 }
+
