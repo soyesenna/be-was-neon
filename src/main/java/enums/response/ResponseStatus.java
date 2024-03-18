@@ -1,4 +1,4 @@
-package enums;
+package enums.response;
 
 public enum ResponseStatus {
     OK("HTTP/1.1 200 OK "),

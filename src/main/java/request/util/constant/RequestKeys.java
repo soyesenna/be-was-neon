@@ -1,4 +1,4 @@
-package request;
+package request.util.constant;
 
 public class RequestKeys {
     public static final String METHOD = "method";

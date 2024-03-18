@@ -1,10 +1,12 @@
-package request;
+package request.util;
 
-import enums.ContentType;
-import enums.HTTPMethods;
+import enums.global.ContentType;
+import enums.global.HTTPMethods;
 import model.UserFiled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import request.data.HttpRequest;
+import request.util.constant.RequestKeys;
 
 import java.io.IOException;
 import java.util.*;

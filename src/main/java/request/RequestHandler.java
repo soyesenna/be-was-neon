@@ -1,8 +1,10 @@
 package request;
 
-import enums.HTTPMethods;
+import enums.global.HTTPMethods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import request.data.HttpRequest;
+import request.util.RequestParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,7 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
-import static request.RequestKeys.*;
+import static request.util.constant.RequestKeys.*;
 
 public class RequestHandler {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);

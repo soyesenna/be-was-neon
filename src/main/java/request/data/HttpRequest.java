@@ -1,7 +1,7 @@
-package request;
+package request.data;
 
-import enums.ContentType;
-import enums.HTTPMethods;
+import enums.global.ContentType;
+import enums.global.HTTPMethods;
 
 import java.util.Collections;
 import java.util.HashMap;

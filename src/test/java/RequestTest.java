@@ -1,7 +1,7 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import request.RequestParser;
+import request.util.RequestParser;
 
 public class RequestTest {
 
@@ -25,6 +25,6 @@ public class RequestTest {
 //            assertThat(httpRequest.getContentType()).isEqualTo(ContentType.HTML);
 //        } catch (IOException e) {
 //            System.out.println(e.getMessage());
-        }
+//        }
     }
 }

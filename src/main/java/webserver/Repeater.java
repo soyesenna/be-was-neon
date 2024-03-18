@@ -3,8 +3,8 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
-import enums.HTTPMethods;
-import request.HttpRequest;
+import enums.global.HTTPMethods;
+import request.data.HttpRequest;
 import request.RequestHandler;
 import response.ResponseHandler;
 import org.slf4j.Logger;

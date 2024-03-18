@@ -1,9 +1,10 @@
-package response;
+package response.util;
 
-import request.HttpRequest;
-import enums.ResponseStatus;
+import enums.response.ResponseStatus;
+import request.data.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import response.data.HttpResponse;
 import utils.Paths;
 
 import java.io.BufferedReader;

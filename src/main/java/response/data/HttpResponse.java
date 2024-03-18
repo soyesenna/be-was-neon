@@ -1,4 +1,4 @@
-package response;
+package response.data;
 
 public class HttpResponse {
 
