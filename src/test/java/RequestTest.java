@@ -1,19 +1,19 @@
-import Data.ParsedHttpRequest;
+import data.HttpRequest;
 import enums.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import utils.HTTPParser;
+import utils.RequestParser;
 import static org.assertj.core.api.Assertions.*;
 
 import java.io.IOException;
 
 public class RequestTest {
 
-    private HTTPParser parser;
+    private RequestParser parser;
     @BeforeEach
     void before() {
-        parser = HTTPParser.getInstance();
+        parser = RequestParser.getInstance();
     }
 
     @Test
@@ -24,9 +24,9 @@ public class RequestTest {
                 "Connection: keep-alive\n" +
                 "Accept: */*";
         try {
-            ParsedHttpRequest parsedHttpRequest = parser.getParsedHTTP(url);
-            assertThat(parsedHttpRequest.getURL()).isEqualTo("/register/index.html");
-            assertThat(parsedHttpRequest.getContentType()).isEqualTo(ContentType.HTML);
+            HttpRequest httpRequest = parser.getParsedHTTP(url);
+            assertThat(httpRequest.getURL()).isEqualTo("/register/index.html");
+            assertThat(httpRequest.getContentType()).isEqualTo(ContentType.HTML);
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
