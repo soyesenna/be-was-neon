@@ -1,17 +1,15 @@
-package utils;
+package response;
 
-import data.HttpRequest;
-import data.HttpResponse;
+import request.HttpRequest;
 import enums.ResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.Paths;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Map;
-import java.util.function.Consumer;
 
 import static utils.StringUtils.*;
 

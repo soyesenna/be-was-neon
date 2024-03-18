@@ -1,12 +1,9 @@
-package handler;
+package response;
 
-import data.HttpRequest;
-import data.HttpResponse;
+import request.HttpRequest;
 import enums.ResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.Paths;
-import utils.ResponseMaker;
 import utils.StringUtils;
 
 import java.io.*;
@@ -24,20 +21,31 @@ public class ResponseHandler {
     }
 
     public void doResponse() throws IOException{
+        logger.info("HTTP METHOD -> {}", parsingResult.getMethods());
+        logger.debug("Request URL -> {}", parsingResult.getURL());
         switch (parsingResult.getMethods()) {
-            case GET -> {
-                logger.info("HTTP METHOD -> GET");
-                logger.debug("Request URL -> {}", parsingResult.getURL());
-                responseGetMethod();
-            }
+            case GET -> responseGetMethod();
+            case POST -> responsePostMethod();
         }
+    }
+
+    private void responsePostMethod() {
+        HttpResponse httpResponse = responseMaker.makeResponse(ResponseStatus.REDIRECT, parsingResult);
+        try {
+            if (!httpResponse.isSuccess()) throw new IOException("Response를 만드는데 실패했습니다");
+            writeResponse(httpResponse);
+        } catch (IOException e){
+            logger.error(e.getMessage());
+        }
+
+        logger.debug("{}로 Redirect됨", StringUtils.DEFAULT_URL);
+        logger.info("POST Response Done");
     }
 
     private void responseGetMethod() {
         HttpResponse httpResponse = responseMaker.makeResponse(ResponseStatus.OK, parsingResult);
         try {
             if (!httpResponse.isSuccess()) throw new IOException("Response를 만드는데 실패했습니다");
-
             writeResponse(httpResponse);
         } catch (IOException e){
             logger.error(e.getMessage());
