@@ -6,7 +6,8 @@ public enum ContentType {
     CSS("text/css"),
     SVG("image/svg+xml"),
     PNG("image/png"),
-    ICO("image/x-icon");
+    ICO("image/x-icon"),
+    URL_ENCODED("application/x-www-form-urlencoded");
 
     private String type;
 

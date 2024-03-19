@@ -30,19 +30,15 @@ public class Repeater implements Runnable {
             //파싱된 http request를 저장
             HttpRequest httpRequest = requestHandler.getRequest();
 
-            if (httpRequest.isSuccess()) {
                 //post인경우 요청사항 처리
-                if (httpRequest.getMethods().equals(HTTPMethods.POST))
-                    postProcessor.process(httpRequest.getURL(), httpRequest.getBody());
+            if (httpRequest.getMethods().equals(HTTPMethods.POST))
+                postProcessor.process(httpRequest.getURL(), httpRequest.getBody());
 
-                //요청에 따라 응답
-                ResponseHandler responseHandler = new ResponseHandler(httpRequest, out);
-                responseHandler.doResponse();
-            } else {
-                logger.error("CAN NOT Parsing Request!!");
-            }
-
-        } catch (IOException e) {
+            //요청에 따라 응답
+            ResponseHandler responseHandler = new ResponseHandler(httpRequest, out);
+            responseHandler.doResponse();
+        }
+        catch (IOException e) {
             logger.error(e.getMessage());
         }
     }

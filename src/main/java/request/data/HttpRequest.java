@@ -14,14 +14,12 @@ public class HttpRequest {
     private String URL;
     private final ContentType contentType;
     private final Map<String, String> body;
-    private final boolean isSuccess;
 
-    public HttpRequest(HTTPMethods methods, String url, Map<String, String> body) {
+    public HttpRequest(HTTPMethods methods, String url, Map<String, String> body, ContentType contentType) {
         this.methods = methods;
         this.URL = url;
         this.body = body;
-        this.contentType = ContentType.NONE;
-        this.isSuccess = true;
+        this.contentType = ContentType.URL_ENCODED;
     }
 
     public HttpRequest(HTTPMethods methods, String url, ContentType contentType) {
@@ -29,7 +27,6 @@ public class HttpRequest {
         this.URL = url;
         this.contentType = contentType;
         this.body = new HashMap<>();
-        this.isSuccess = true;
     }
 
     public HttpRequest() {
@@ -37,11 +34,6 @@ public class HttpRequest {
         this.URL = DEFAULT_STRING;
         this.contentType = ContentType.NONE;
         this.body = new HashMap<>();
-        this.isSuccess = false;
-    }
-
-    public boolean isSuccess() {
-        return isSuccess;
     }
 
     public HTTPMethods getMethods() {
@@ -66,7 +58,6 @@ public class HttpRequest {
                 "methods=" + methods +
                 ", URL='" + URL + '\'' +
                 ", contentType=" + contentType +
-                ", isSuccess=" + isSuccess +
                 '}';
     }
 }

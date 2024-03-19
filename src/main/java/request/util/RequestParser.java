@@ -34,7 +34,6 @@ public class RequestParser {
      */
     public HttpRequest getParsedHTTP(Map<String, String> request) throws IOException{
         //유효하지 않은 http request일 경우 리턴될 객체
-        //isSuccess == false임
         HttpRequest result = new HttpRequest();
         try {
             //유효한 http메서드인지 검사함
@@ -46,14 +45,11 @@ public class RequestParser {
             }
 
         } catch (IllegalArgumentException e) {
-            logger.error(e.getMessage());
+            throw new IOException(e.getMessage());
         }
 
         logger.debug(result.getURL());
 
-        //파싱이 잘못되면 result.isSuccess == false
-        logger.info("Request Parsing DONE");
-        logger.debug("Parsing Success ? {}",  result.isSuccess());
         return result;
     }
 
@@ -73,10 +69,10 @@ public class RequestParser {
             throw new IllegalArgumentException(ILLEGAL_BODY_MESSAGE);
         }
 
-        return new HttpRequest(HTTPMethods.POST, request.get(RequestKeys.URL), body);
+        return new HttpRequest(HTTPMethods.POST, request.get(RequestKeys.URL), body, ContentType.URL_ENCODED);
     }
 
-    private HttpRequest parseGet(Map<String, String> request) {
+    private HttpRequest parseGet(Map<String, String> request) throws IllegalArgumentException{
         HttpRequest result;
         if (request.get(RequestKeys.URL).contains(FILE_SYMBOL)) {
             //content-type 파싱 :: 파일을 요청한경우

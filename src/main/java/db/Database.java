@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Database {
+
+    private Database(){}
     private static Map<String, User> users = new HashMap<>();
 
     public static void addUser(User user) {

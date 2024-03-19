@@ -1,6 +1,9 @@
 package request.util.constant;
 
 public class RequestKeys {
+
+    private RequestKeys(){}
+
     public static final String METHOD = "method";
     public static final String URL = "url";
     public static final String HTTP_VERSION = "HTTP_VERSION";
