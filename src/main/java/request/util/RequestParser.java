@@ -1,7 +1,7 @@
 package request.util;
 
-import enums.global.ContentType;
-import enums.global.HTTPMethods;
+import utils.ContentType;
+import utils.HTTPMethods;
 import model.UserFiled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

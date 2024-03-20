@@ -1,7 +1,7 @@
 package request;
 
-import enums.global.ContentType;
-import enums.global.HTTPMethods;
+import utils.ContentType;
+import utils.HTTPMethods;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import request.data.HttpRequest;
@@ -48,7 +48,7 @@ public class RequestHandlerTest {
         HttpRequest httpRequest = requestHandler.getRequest();
 
         assertThat(httpRequest.getMethods()).isEqualTo(HTTPMethods.POST);
-        assertThat(httpRequest.getContentType()).isEqualTo(ContentType.NONE);
+        assertThat(httpRequest.getContentType()).isEqualTo(ContentType.URL_ENCODED);
         assertThat(httpRequest.getBody()).containsKeys(USERID.getFiled(), PASSWORD.getFiled(), NAME.getFiled(), EMAIL.getFiled());
     }
 
@@ -68,35 +68,42 @@ public class RequestHandlerTest {
     }
 
     @Test
-    @DisplayName("헤더가 잘못된 상황에 IOException을 던져야함")
-    void throwIOExceptionWhenIllegalHeader() {
+    @DisplayName("http method 없을때 IOException을 던져야함")
+    void throwIOExceptionWhenNoHttpMethod() {
         //http method 없을때
         String noMethod = "/register HTTP/1.1\r\n" +
                 "Host: localhost:8080\r\n" +
                 "Connection: keep-alive\r\n" +
                 "Accept: */*";
-        InputStream in = new ByteArrayInputStream(noMethod.getBytes());
-        final RequestHandler noMethodRequest = new RequestHandler(in);
-        assertThatThrownBy(() -> noMethodRequest.getRequest()).isInstanceOf(IOException.class);
+        verifyNoHeader(noMethod);
+    }
 
+    @Test
+    @DisplayName("요청 url이 없을 때 IOException을 던져야함")
+    void throwIOExceptionWhenNoURL() {
         //요청 url이 없을 때
         String noURL = "GET HTTP/1.1\r\n" +
                 "Host: localhost:8080\r\n" +
                 "Connection: keep-alive\r\n" +
                 "Accept: */*";
-        in = new ByteArrayInputStream(noURL.getBytes());
-        final RequestHandler noURLRequest = new RequestHandler(in);
-        assertThatThrownBy(() -> noURLRequest.getRequest()).isInstanceOf(IOException.class);
+        verifyNoHeader(noURL);
+    }
 
+    @Test
+    @DisplayName("http 버전이 없을 때 IOException을 던져야함")
+    void throwIOExceptionNoVersion() {
         //http 버전이 없을 때
         String noVersion = "GET /register\r\n" +
                 "Host: localhost:8080\r\n" +
                 "Connection: keep-alive\r\n" +
                 "Accept: */*";
-        in = new ByteArrayInputStream(noVersion.getBytes());
-        final RequestHandler noVersionRequest = new RequestHandler(in);
-        assertThatThrownBy(() -> noVersionRequest.getRequest()).isInstanceOf(IOException.class);
+        verifyNoHeader(noVersion);
     }
 
+    void verifyNoHeader(String noHeader) {
+        InputStream in = new ByteArrayInputStream(noHeader.getBytes());
+        final RequestHandler noMethodRequest = new RequestHandler(in);
+        assertThatThrownBy(() -> noMethodRequest.getRequest()).isInstanceOf(IOException.class);
+    }
 
 }

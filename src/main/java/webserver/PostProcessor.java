@@ -1,7 +1,7 @@
 package webserver;
 
 import db.Database;
-import enums.request.PostRequestURL;
+import request.util.PostRequestURL;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

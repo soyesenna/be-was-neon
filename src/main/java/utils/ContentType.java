@@ -1,4 +1,4 @@
-package enums.global;
+package utils;
 
 public enum ContentType {
     NONE(""),

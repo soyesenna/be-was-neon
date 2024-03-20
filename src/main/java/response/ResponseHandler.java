@@ -1,7 +1,7 @@
 package response;
 
 import request.data.HttpRequest;
-import enums.response.ResponseStatus;
+import response.util.ResponseStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import response.data.HttpResponse;

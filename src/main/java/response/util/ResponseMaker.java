@@ -1,6 +1,5 @@
 package response.util;
 
-import enums.response.ResponseStatus;
 import request.data.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +56,8 @@ public class ResponseMaker {
             fileReader.lines()
                     .forEach(string -> sb.append(appendHttpEndLine(string)));
         }
+
+        logger.info("Response Body Created");
         return sb.toString().getBytes();
     }
 
@@ -74,6 +75,7 @@ public class ResponseMaker {
             }
         }
 
+        logger.info("Response Header Created");
         return sb.toString();
     }
 }

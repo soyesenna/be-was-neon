@@ -1,4 +1,4 @@
-package enums.global;
+package utils;
 
 public enum HTTPMethods {
     NONE, GET, POST

@@ -3,7 +3,7 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
-import enums.global.HTTPMethods;
+import utils.HTTPMethods;
 import request.data.HttpRequest;
 import request.RequestHandler;
 import response.ResponseHandler;
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class Repeater implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(Repeater.class);
-    private Socket connection;
+    private final Socket connection;
     private final PostProcessor postProcessor = PostProcessor.getInstance();
 
     public Repeater(Socket connectionSocket) {
@@ -25,12 +25,12 @@ public class Repeater implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-
             RequestHandler requestHandler = new RequestHandler(in);
+
             //파싱된 http request를 저장
             HttpRequest httpRequest = requestHandler.getRequest();
 
-                //post인경우 요청사항 처리
+            //post인경우 요청사항 처리
             if (httpRequest.getMethods().equals(HTTPMethods.POST))
                 postProcessor.process(httpRequest.getURL(), httpRequest.getBody());
 

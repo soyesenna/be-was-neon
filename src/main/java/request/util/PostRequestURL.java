@@ -1,4 +1,4 @@
-package enums.request;
+package request.util;
 
 import java.util.Arrays;
 

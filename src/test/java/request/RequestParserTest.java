@@ -1,7 +1,7 @@
 package request;
 
-import enums.global.ContentType;
-import enums.global.HTTPMethods;
+import utils.ContentType;
+import utils.HTTPMethods;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
