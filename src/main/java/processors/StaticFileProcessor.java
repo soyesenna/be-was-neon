@@ -8,8 +8,9 @@ import property.annotations.Processor;
 import request.data.HttpRequest;
 import response.data.HttpResponse;
 import response.util.ResponseStatus;
-import utils.ContentType;
 import utils.Paths;
+
+import static utils.Paths.*;
 
 /**
  * static한 파일 요청한 경우 처리해주는 프로세서
@@ -18,7 +19,6 @@ import utils.Paths;
 public class StaticFileProcessor {
     private static final Logger logger = LoggerFactory.getLogger(StaticFileProcessor.class);
     private static final StaticFileProcessor instance = new StaticFileProcessor();
-    private static final String DEFAULT_FILE = "/index.html";
 
     private StaticFileProcessor() {
 
@@ -47,7 +47,7 @@ public class StaticFileProcessor {
     @GetMapping("/")
     public void welcomePage(HttpRequest request, HttpResponse response) {
         logger.debug("WelcomePage Call");
-        String filePath = Paths.STATIC_RESOURCES + request.getURL() + "index.html";
+        String filePath = Paths.STATIC_RESOURCES + request.getURL() + DEFAULT_FILE.substring(1);
 
         setResponse(request, response, filePath);
     }

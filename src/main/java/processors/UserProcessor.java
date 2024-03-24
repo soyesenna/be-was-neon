@@ -1,6 +1,7 @@
 package processors;
 
 
+import db.Session;
 import exceptions.NoResponseBodyException;
 import property.annotations.PostMapping;
 import property.annotations.Processor;
@@ -12,10 +13,10 @@ import request.data.HttpRequest;
 import response.data.HttpResponse;
 import response.util.ResponseStatus;
 import utils.ContentType;
-import utils.HTTPMethods;
 import utils.Paths;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static model.UserFiled.*;
 
@@ -24,6 +25,7 @@ public class UserProcessor {
     private static final Logger logger = LoggerFactory.getLogger(UserProcessor.class);
 
     private static final UserProcessor instance = new UserProcessor();
+    private Session session = Session.getInstance();
 
     private UserProcessor() {
 
@@ -62,10 +64,15 @@ public class UserProcessor {
             response.setBody(loginFailHTML);
             try {
                 response.setHeader(ResponseStatus.OK, ContentType.HTML);
-            }catch (NoResponseBodyException e){
+            }catch (NoResponseBodyException e) {
                 logger.error(e.getMessage());
             }
+        //login success
         }else {
+            String userSessionId = UUID.randomUUID().toString();
+            //session에 추가
+            session.addSession(userSessionId, userById);
+            response.setCookie(userSessionId);
             try {
                 response.setHeader(ResponseStatus.REDIRECT, ContentType.HTML);
             } catch (NoResponseBodyException e){

@@ -22,11 +22,15 @@ public class HttpResponse {
     private String header;
     private byte[] body;
     private boolean hasBody;
+    private String cookie;
+    private boolean hasCookie;
 
     public HttpResponse() {
         this.header = "";
         this.hasBody = false;
         this.body = new byte[]{};
+        this.cookie = "sid=";
+        this.hasCookie = false;
     }
 
     public String getHeader() {
@@ -39,6 +43,16 @@ public class HttpResponse {
 
     public boolean hasBody() {
         return this.hasBody;
+    }
+
+    public boolean hasCookie() {
+        return this.hasCookie;
+    }
+
+    public void setCookie(String cookieId) {
+        this.cookie += cookieId;
+        this.cookie += "; Path=/";
+        this.hasCookie = true;
     }
 
     public void setHeader(ResponseStatus status, ContentType type) throws NoResponseBodyException{
@@ -54,6 +68,10 @@ public class HttpResponse {
             case REDIRECT -> {
                 sb.append(appendHttpEndLine("Location: " + DEFAULT_URL));
             }
+        }
+
+        if (this.hasCookie) {
+            sb.append(appendHttpEndLine("Set-Cookie: " + this.cookie));
         }
 
         this.header = sb.toString();
