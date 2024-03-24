@@ -3,16 +3,15 @@ package response.data;
 import exceptions.NoResponseBodyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import request.RequestReader;
 import response.util.DynamicHTMLMapper;
 import response.util.ResponseStatus;
 import utils.ContentType;
-import utils.Paths;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URLDecoder;
 
 import static utils.StringUtils.DEFAULT_URL;
 import static utils.StringUtils.appendHttpEndLine;
@@ -20,6 +19,7 @@ import static utils.StringUtils.appendHttpEndLine;
 public class HttpResponse {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
+    private static final String DELETE_COOKIE = "max-age=0";
     private String header;
     private byte[] body;
     private boolean hasBody;
@@ -53,6 +53,12 @@ public class HttpResponse {
     public void setCookie(String cookieId) {
         this.cookie += cookieId;
         this.cookie += "; Path=/";
+        this.hasCookie = true;
+    }
+
+    public void deleteCookie(String cookieId) {
+        this.cookie += cookieId + ";";
+        this.cookie += DELETE_COOKIE;
         this.hasCookie = true;
     }
 
@@ -99,16 +105,21 @@ public class HttpResponse {
     }
 
     //동적으로 html생성하는 메서드
-    public void setBody(String urlPath, DynamicHTMLMapper dynamicIdentity) {
+    public void setBodyInLogin(String urlPath, String userName) {
         StringBuilder sb = new StringBuilder();
         logger.debug(urlPath);
 
         try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(urlPath)))) {
+            String decodeName = URLDecoder.decode(userName, "UTF-8");
             fileReader.lines()
                     .forEach(string -> {
-                        if (string.contains(DynamicHTMLMapper.DYNAMIC_CODE.getValue())) {
+                        if (string.contains(DynamicHTMLMapper.DYNAMIC_LOGIN_CODE.getValue())) {
                             sb.append(appendHttpEndLine(DynamicHTMLMapper.WELCOME_PAGE_LOGIN.getValue()));
-                        }else sb.append(appendHttpEndLine(string));
+                        } else if (string.contains(DynamicHTMLMapper.ADD_USERNAME_CODE.getValue())) {
+                            sb.append(appendHttpEndLine("<a>환영합니다! " + decodeName + "님 </a>"));
+                        } else {
+                            sb.append(appendHttpEndLine(string));
+                        }
                     });
         } catch (IOException e) {
             logger.error(e.getMessage());

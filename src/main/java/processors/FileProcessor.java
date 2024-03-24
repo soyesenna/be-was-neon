@@ -56,7 +56,7 @@ public class FileProcessor {
         User checkSession = checkCookieAndSession(request);
         if (checkSession != null) {
             logger.debug("login welcome page");
-            setResponse(request, response, filePath, DynamicHTMLMapper.WELCOME_PAGE_LOGIN);
+            setResponse(request, response, filePath, checkSession.getName());
         } else {
             logger.debug("No login welcome page");
             setResponse(request, response, filePath);
@@ -71,8 +71,8 @@ public class FileProcessor {
         setResponse(request, response, filePath);
     }
 
-    private void setResponse(HttpRequest request, HttpResponse response, String filePath, DynamicHTMLMapper dynamicIdentity) {
-        response.setBody(filePath, dynamicIdentity);
+    private void setResponse(HttpRequest request, HttpResponse response, String filePath, String userId) {
+        response.setBodyInLogin(filePath, userId);
         try {
             response.setHeader(ResponseStatus.OK, request.getContentType());
         } catch (NoResponseBodyException e) {

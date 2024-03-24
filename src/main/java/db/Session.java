@@ -28,4 +28,8 @@ public class Session {
     public static long getSessionSize() {
         return sessionStore.size();
     }
+
+    public static void deleteSessionById(String id) {
+        sessionStore.remove(id);
+    }
 }

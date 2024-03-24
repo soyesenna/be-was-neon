@@ -3,6 +3,7 @@ package processors;
 
 import db.Session;
 import exceptions.NoResponseBodyException;
+import property.annotations.GetMapping;
 import property.annotations.PostMapping;
 import property.annotations.Processor;
 import db.Database;
@@ -63,20 +64,36 @@ public class UserProcessor {
             response.setBody(loginFailHTML);
             try {
                 response.setHeader(ResponseStatus.OK, ContentType.HTML);
-            }catch (NoResponseBodyException e) {
+            } catch (NoResponseBodyException e) {
                 logger.error(e.getMessage());
             }
-        //login success
-        }else {
+            //login success
+        } else {
             String userSessionId = UUID.randomUUID().toString();
             //session에 추가
             Session.addSession(userSessionId, userById);
             response.setCookie(userSessionId);
             try {
-                response.setHeader(ResponseStatus.REDIRECT, ContentType.HTML);
-            } catch (NoResponseBodyException e){
+                response.setHeader(ResponseStatus.REDIRECT, ContentType.NONE);
+            } catch (NoResponseBodyException e) {
                 logger.error(e.getMessage());
             }
+        }
+    }
+
+    @GetMapping("/logout")
+    public void logout(HttpRequest request, HttpResponse response) {
+        String sessionId = request.getCookie().get(Session.COOKIE_SESSION_ID);
+
+        //세션에서 유저 정보 삭제
+        Session.deleteSessionById(sessionId);
+
+        try {
+            response.deleteCookie(sessionId);
+            response.setBody(Paths.STATIC_RESOURCES + Paths.DEFAULT_FILE);
+            response.setHeader(ResponseStatus.OK, ContentType.HTML);
+        } catch (NoResponseBodyException e) {
+            logger.error(e.getMessage());
         }
     }
 }
