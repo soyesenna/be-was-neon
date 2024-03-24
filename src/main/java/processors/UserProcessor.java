@@ -12,6 +12,8 @@ import request.data.HttpRequest;
 import response.data.HttpResponse;
 import response.util.ResponseStatus;
 import utils.ContentType;
+import utils.HTTPMethods;
+import utils.Paths;
 
 import java.util.Map;
 
@@ -44,9 +46,31 @@ public class UserProcessor {
 
         try {
             response.setHeader(ResponseStatus.REDIRECT, ContentType.NONE);
-        }catch (NoResponseBodyException e){
-
+        } catch (NoResponseBodyException e) {
+            e.getMessage();
         }
     }
 
+    @PostMapping("/login")
+    public void login(HttpRequest request, HttpResponse response) {
+        Map<String, String> body = request.getBody();
+
+        User userById = Database.findUserById(body.get(USERID.getFiled()));
+        //login fail
+        if (userById == null || !userById.getPassword().equals(body.get(PASSWORD.getFiled()))) {
+            String loginFailHTML = Paths.STATIC_RESOURCES + "/login/login_fail.html";
+            response.setBody(loginFailHTML);
+            try {
+                response.setHeader(ResponseStatus.OK, ContentType.HTML);
+            }catch (NoResponseBodyException e){
+                logger.error(e.getMessage());
+            }
+        }else {
+            try {
+                response.setHeader(ResponseStatus.REDIRECT, ContentType.HTML);
+            } catch (NoResponseBodyException e){
+                logger.error(e.getMessage());
+            }
+        }
+    }
 }
