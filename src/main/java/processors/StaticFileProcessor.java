@@ -36,6 +36,14 @@ public class StaticFileProcessor {
         setResponse(request, response, path);
     }
 
+    @GetMapping("/login")
+    public void loginPage(HttpRequest request, HttpResponse response) {
+        logger.debug("LoginPage Call");
+        String filePath = Paths.STATIC_RESOURCES + request.getURL() + DEFAULT_FILE;
+
+        setResponse(request, response, filePath);
+    }
+
     @GetMapping("/")
     public void welcomePage(HttpRequest request, HttpResponse response) {
         logger.debug("WelcomePage Call");
