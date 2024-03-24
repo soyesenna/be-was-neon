@@ -3,7 +3,6 @@ package webserver;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
-import java.util.Map;
 
 import property.Properties;
 import property.Property;
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import response.ResponseSender;
 import response.data.HttpResponse;
 
-import javax.xml.crypto.Data;
 
 
 public class Repeater implements Runnable {

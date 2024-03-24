@@ -20,12 +20,10 @@ import java.util.Map;
 public class UserProcessorTest {
 
     private UserProcessor userProcessor;
-    private Session session;
 
     @BeforeEach
     void before() throws Exception{
         userProcessor = UserProcessor.getInstance();
-        session = Session.getInstance();
     }
 
     @Test
@@ -68,8 +66,8 @@ public class UserProcessorTest {
         assertThat(response.hasCookie()).isTrue();
         assertThat(response.getHeader()).contains("Set-Cookie");
         assertThat(response.getHeader()).contains(ResponseStatus.REDIRECT.getCode());
-        
-        assertThat(session.getSessionSize()).isEqualTo(1);
+
+        assertThat(Session.getSessionSize()).isEqualTo(1);
     }
 
 }

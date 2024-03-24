@@ -3,7 +3,7 @@ package processor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import processors.StaticFileProcessor;
+import processors.FileProcessor;
 import request.data.HttpRequest;
 import response.data.HttpResponse;
 import response.util.ResponseStatus;
@@ -13,20 +13,19 @@ import utils.Paths;
 import utils.StringUtils;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.FileReader;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class StaticFileProcessorTest {
+public class FileProcessorTest {
 
-    private StaticFileProcessor staticFileProcessor;
+    private FileProcessor fileProcessor;
     private byte[] registerPage;
     private byte[] welcomePage;
 
     @BeforeEach
     void before() throws Exception {
-        staticFileProcessor = StaticFileProcessor.getInstance();
+        fileProcessor = FileProcessor.getInstance();
 
         //register page init
         StringBuilder sb = new StringBuilder();
@@ -49,7 +48,7 @@ public class StaticFileProcessorTest {
         HttpRequest request = new HttpRequest(HTTPMethods.GET, "/", ContentType.HTML);
 
         HttpResponse response = new HttpResponse();
-        staticFileProcessor.welcomePage(request, response);
+        fileProcessor.welcomePage(request, response);
 
         assertThat(response.getHeader()).contains(ResponseStatus.OK.getCode());
         assertThat(response.getBody()).isNotEmpty();
@@ -63,7 +62,7 @@ public class StaticFileProcessorTest {
         HttpRequest request = new HttpRequest(HTTPMethods.GET, "/reset.css", ContentType.CSS);
 
         HttpResponse response = new HttpResponse();
-        staticFileProcessor.responseFile(request, response);
+        fileProcessor.responseFile(request, response);
 
         assertThat(response.hasBody()).isTrue();
         assertThat(response.getHeader()).contains(ContentType.CSS.getType());
@@ -76,7 +75,7 @@ public class StaticFileProcessorTest {
         HttpRequest request = new HttpRequest(HTTPMethods.GET, "/registration", ContentType.HTML);
 
         HttpResponse response = new HttpResponse();
-        staticFileProcessor.registerPage(request, response);
+        fileProcessor.registerPage(request, response);
 
         assertThat(response.hasBody()).isTrue();
         assertThat(response.getHeader()).contains(ContentType.HTML.getType());

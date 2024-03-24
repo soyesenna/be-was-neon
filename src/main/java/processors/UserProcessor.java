@@ -25,7 +25,6 @@ public class UserProcessor {
     private static final Logger logger = LoggerFactory.getLogger(UserProcessor.class);
 
     private static final UserProcessor instance = new UserProcessor();
-    private Session session = Session.getInstance();
 
     private UserProcessor() {
 
@@ -71,7 +70,7 @@ public class UserProcessor {
         }else {
             String userSessionId = UUID.randomUUID().toString();
             //session에 추가
-            session.addSession(userSessionId, userById);
+            Session.addSession(userSessionId, userById);
             response.setCookie(userSessionId);
             try {
                 response.setHeader(ResponseStatus.REDIRECT, ContentType.HTML);

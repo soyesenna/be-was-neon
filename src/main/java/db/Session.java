@@ -1,33 +1,31 @@
 package db;
 
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import processors.FileProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Session {
-    private final Map<String, User> sessionStore = new HashMap<>();
-    private static final Session instance = new Session();
-    private Session() {
+    private static final Map<String, User> sessionStore = new HashMap<>();
+    private static final Logger logger = LoggerFactory.getLogger(Session.class);
+    public static final String COOKIE_SESSION_ID = "sid";
 
-    }
-
-    public static Session getInstance() {
-        return instance;
-    }
-
-    public void addSession(String id, User user) {
+    public static void addSession(String id, User user) {
         sessionStore.put(id, user);
     }
 
-    public User getUserBySessionId(String id) {
+    public static User getUserBySessionId(String id) {
+        logger.debug(sessionStore.toString());
         User user = sessionStore.get(id);
         if (user == null) return null;
 
         return user;
     }
 
-    public long getSessionSize() {
-        return this.sessionStore.size();
+    public static long getSessionSize() {
+        return sessionStore.size();
     }
 }

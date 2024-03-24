@@ -25,7 +25,7 @@ public class ResponseSender {
         if (response.hasBody()) dos.write(response.getBody());
         dos.flush();
 
-
+        logger.debug(response.getHeader());
         logger.info("Send Response");
     }
 }

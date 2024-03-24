@@ -3,9 +3,7 @@ package request.data;
 import utils.ContentType;
 import utils.HTTPMethods;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class HttpRequest {
     private static final String DEFAULT_STRING = "";
@@ -14,12 +12,14 @@ public class HttpRequest {
     private String URL;
     private final ContentType contentType;
     private final Map<String, String> body;
+    private Map<String, String> cookie;
 
     public HttpRequest(HTTPMethods methods, String url, Map<String, String> body, ContentType contentType) {
         this.methods = methods;
         this.URL = url;
         this.body = body;
         this.contentType = contentType;
+        this.cookie = new HashMap<>();
     }
 
     public HttpRequest(HTTPMethods methods, String url, ContentType contentType) {
@@ -27,6 +27,7 @@ public class HttpRequest {
         this.URL = url;
         this.contentType = contentType;
         this.body = new HashMap<>();
+        this.cookie = new HashMap<>();;
     }
 
     public HttpRequest() {
@@ -34,6 +35,7 @@ public class HttpRequest {
         this.URL = DEFAULT_STRING;
         this.contentType = ContentType.NONE;
         this.body = new HashMap<>();
+        this.cookie = new HashMap<>();
     }
 
     public HTTPMethods getMethods() {
@@ -50,6 +52,19 @@ public class HttpRequest {
 
     public Map<String, String> getBody() {
         return Collections.unmodifiableMap(this.body);
+    }
+
+    public void addCookie(String cookies) {
+        StringTokenizer st = new StringTokenizer(cookies, "; ");
+        while (st.hasMoreTokens()) {
+            String nowCookie = st.nextToken();
+            String[] tmp = nowCookie.split("=");
+            this.cookie.put(tmp[0], tmp[1]);
+        }
+    }
+
+    public Map<String, String> getCookie() {
+        return this.cookie;
     }
 
     @Override

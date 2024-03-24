@@ -44,6 +44,11 @@ public class RequestParser {
                 case POST -> result = parsePost(request);
             }
 
+            //쿠키 있을경우
+            if (request.containsKey(RequestKeys.COOKIE)) {
+                result.addCookie(request.get(RequestKeys.COOKIE));
+            }
+
         } catch (IllegalArgumentException e) {
             throw new IOException(e.getMessage());
         }

@@ -13,4 +13,5 @@ public class RequestKeys {
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String ACCEPT = "Accept";
     public static final String BODY = "Body";
+    public static final String COOKIE = "Cookie";
 }

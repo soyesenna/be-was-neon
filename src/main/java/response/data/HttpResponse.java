@@ -4,6 +4,7 @@ import exceptions.NoResponseBodyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import request.RequestReader;
+import response.util.DynamicHTMLMapper;
 import response.util.ResponseStatus;
 import utils.ContentType;
 import utils.Paths;
@@ -90,6 +91,27 @@ public class HttpResponse {
             //파일이 아닐경우 받은 String을 그대로 설정한다
             this.body = urlPath.getBytes();
             this.hasBody = true;
+            return;
+        }
+
+        this.body = sb.toString().getBytes();
+        this.hasBody = true;
+    }
+
+    //동적으로 html생성하는 메서드
+    public void setBody(String urlPath, DynamicHTMLMapper dynamicIdentity) {
+        StringBuilder sb = new StringBuilder();
+        logger.debug(urlPath);
+
+        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(urlPath)))) {
+            fileReader.lines()
+                    .forEach(string -> {
+                        if (string.contains(DynamicHTMLMapper.DYNAMIC_CODE.getValue())) {
+                            sb.append(appendHttpEndLine(DynamicHTMLMapper.WELCOME_PAGE_LOGIN.getValue()));
+                        }else sb.append(appendHttpEndLine(string));
+                    });
+        } catch (IOException e) {
+            logger.error(e.getMessage());
             return;
         }
 

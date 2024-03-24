@@ -51,8 +51,13 @@ public class RequestReader {
         String line;
         while ((line = inputStream.readLine()) != null) {
             if (line.isEmpty()) break;
-            String[] tmp = line.split(" ");
-            httpRequest.put(tmp[0].replace(":", ""), tmp[1]);
+            String[] tmp = line.split(":");
+
+            String value = "";
+            for (int i = 1; i < tmp.length; i++) value += tmp[i];
+            value = value.trim();
+
+            httpRequest.put(tmp[0], value);
         }
 
         logger.debug("Request Header Read");

@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import processors.StaticFileProcessor;
 import property.Properties;
 import property.Property;
 import property.RunnableMethod;
