@@ -1,5 +1,7 @@
-package request.util;
+package request;
 
+import request.data.HttpRequest;
+import request.util.RequestParser;
 import utils.HTTPMethods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,19 +16,29 @@ import static request.util.constant.RequestKeys.BODY;
 
 public class RequestReader {
     private static final Logger logger = LoggerFactory.getLogger(RequestReader.class);
-    private static final RequestReader instance = new RequestReader();
 
-    private RequestReader(){}
+    private final RequestParser parser = RequestParser.getInstance();
 
-    public static RequestReader getInstance(){
-        return instance;
+    private final BufferedReader inputStream;
+
+
+    public RequestReader(BufferedReader inputStream) {
+        this.inputStream = inputStream;
     }
 
-    public Map<String, String> readHttpRequest(final BufferedReader bufferedReader) throws IOException {
+    public HttpRequest readHttpRequest() throws IOException {
+        Map<String, String> readResult = readInputStream();
+
+        HttpRequest parsedHTTP = parser.getParsedHTTP(readResult);
+
+        return parsedHTTP;
+    }
+
+    private Map<String, String> readInputStream() throws IOException{
         Map<String, String> httpRequest = new HashMap<>();
 
         //header start line
-        String[] startLine = bufferedReader.readLine().split(" ");
+        String[] startLine = inputStream.readLine().split(" ");
         try {
             httpRequest.put(METHOD, startLine[0]);
             httpRequest.put(URL, startLine[1]);
@@ -37,7 +49,7 @@ public class RequestReader {
 
         //header
         String line;
-        while ((line = bufferedReader.readLine()) != null) {
+        while ((line = inputStream.readLine()) != null) {
             if (line.isEmpty()) break;
             String[] tmp = line.split(" ");
             httpRequest.put(tmp[0].replace(":", ""), tmp[1]);
@@ -49,7 +61,7 @@ public class RequestReader {
             int bodyLength = Integer.parseInt(httpRequest.get(CONTENT_LENGTH));
 
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < bodyLength; i++) sb.append((char) bufferedReader.read());
+            for (int i = 0; i < bodyLength; i++) sb.append((char) inputStream.read());
 
             httpRequest.put(BODY, sb.toString());
 

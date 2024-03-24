@@ -19,7 +19,7 @@ public class HttpRequest {
         this.methods = methods;
         this.URL = url;
         this.body = body;
-        this.contentType = ContentType.URL_ENCODED;
+        this.contentType = contentType;
     }
 
     public HttpRequest(HTTPMethods methods, String url, ContentType contentType) {

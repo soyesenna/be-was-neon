@@ -1,20 +1,27 @@
 package webserver;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.util.Map;
 
-import utils.HTTPMethods;
+import property.Properties;
+import property.Property;
+import property.RunnableMethod;
 import request.data.HttpRequest;
-import request.RequestHandler;
-import response.ResponseHandler;
+import request.RequestReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import response.ResponseSender;
+import response.data.HttpResponse;
+
+import javax.xml.crypto.Data;
 
 
 public class Repeater implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(Repeater.class);
+    private static final Properties properties = Properties.getInstance();
     private final Socket connection;
-    private final PostProcessor postProcessor = PostProcessor.getInstance();
 
     public Repeater(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -25,24 +32,38 @@ public class Repeater implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            RequestHandler requestHandler = new RequestHandler(in);
+            HttpRequest request;
+            //요청을 읽고 파싱
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+            RequestReader reader = new RequestReader(bufferedReader);
+            request = reader.readHttpRequest();
 
-            //파싱된 http request를 저장
-            HttpRequest httpRequest = requestHandler.getRequest();
+            //응답 객체 생성
+            HttpResponse response = new HttpResponse();
 
-            //post인경우 요청사항 처리
-            if (httpRequest.getMethods().equals(HTTPMethods.POST))
-                postProcessor.process(httpRequest.getURL(), httpRequest.getBody());
+            //현재 요청에 대한 processor 가져옴
+            RunnableMethod nowProcessor = properties.getProcessingMethodByProperty(Property.of(request.getMethods(), request.getURL()));
+            //url에 따른 요청 실행
+            methodInvoke(nowProcessor, request, response);
+            logger.debug("Processing Done");
 
-            //요청에 따라 응답
-            ResponseHandler responseHandler = new ResponseHandler(httpRequest, out);
-            responseHandler.doResponse();
+            //요청 실행 후 만들어진 응답 send
+            DataOutputStream dataOutputStream = new DataOutputStream(out);
+            ResponseSender sender = new ResponseSender(response, dataOutputStream);
+            sender.doResponse();
+
+            //응답 보낸 후 연결 종료
+            bufferedReader.close();
+            dataOutputStream.close();
         }
-        catch (IOException e) {
+        catch (IOException | InvocationTargetException | IllegalAccessException e) {
             logger.error(e.getMessage());
         }
     }
 
+    private void methodInvoke(RunnableMethod nowProcessor, HttpRequest request, HttpResponse response) throws InvocationTargetException, IllegalAccessException {
+        nowProcessor.method().invoke(nowProcessor.instance().invoke(null), request, response);
+    }
 
 }
 

@@ -73,15 +73,12 @@ public class RequestParser {
     }
 
     private HttpRequest parseGet(Map<String, String> request) throws IllegalArgumentException{
-        HttpRequest result;
+        HttpRequest result = new HttpRequest(HTTPMethods.GET, request.get(RequestKeys.URL), ContentType.HTML);
+
         if (request.get(RequestKeys.URL).contains(FILE_SYMBOL)) {
             //content-type 파싱 :: 파일을 요청한경우
             ContentType contentType = ContentType.valueOf(request.get(RequestKeys.URL).split("\\.")[1].toUpperCase());
             result = new HttpRequest(HTTPMethods.GET, request.get(RequestKeys.URL), contentType);
-        }else {
-            //file이 아닌 기본 url일 경우 index.html 매핑
-            String url = request.get(RequestKeys.URL) + DEFAULT_URL;
-            result = new HttpRequest(HTTPMethods.GET, url, ContentType.HTML);
         }
         return result;
     }
