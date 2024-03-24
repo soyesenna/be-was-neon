@@ -6,11 +6,11 @@ import exceptions.NoResponseBodyException;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import processors.util.ProcessorUtil;
 import property.annotations.GetMapping;
 import property.annotations.Processor;
 import request.data.HttpRequest;
 import response.data.HttpResponse;
-import response.util.DynamicHTMLMapper;
 import response.util.ResponseStatus;
 import utils.Paths;
 
@@ -53,7 +53,7 @@ public class FileProcessor {
         logger.debug("WelcomePage Call");
         String filePath = Paths.STATIC_RESOURCES + request.getURL() + DEFAULT_FILE.substring(1);
 
-        User checkSession = checkCookieAndSession(request);
+        User checkSession = ProcessorUtil.checkCookieAndSession(request);
         if (checkSession != null) {
             logger.debug("login welcome page");
             setResponse(request, response, filePath, checkSession.getName());
@@ -89,23 +89,5 @@ public class FileProcessor {
         }
     }
 
-    private User checkCookieAndSession(HttpRequest request) {
-        if (request.getCookie().isEmpty()) return null;
-        if (!request.getCookie().containsKey(Session.COOKIE_SESSION_ID)) return null;
 
-        //쿠키를 파싱하고 세션에 등록된경우 User 반환
-        String sessionId = request.getCookie().get(Session.COOKIE_SESSION_ID);
-        logger.debug(sessionId);
-        try {
-            User userBySessionId = Session.getUserBySessionId(sessionId);
-            logger.debug("세션에서 유저 찾음");
-            User userByIdInDB = Database.findUserById(userBySessionId.getUserId());
-            logger.debug("db에서 유저 찾음");
-
-            return userBySessionId.equals(userByIdInDB) ? userBySessionId : null;
-        }catch (IndexOutOfBoundsException | NullPointerException e) {
-            logger.error("잘못된 쿠키 입니다");
-            return null;
-        }
-    }
 }

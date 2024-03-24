@@ -3,6 +3,7 @@ package processors;
 
 import db.Session;
 import exceptions.NoResponseBodyException;
+import processors.util.ProcessorUtil;
 import property.annotations.GetMapping;
 import property.annotations.PostMapping;
 import property.annotations.Processor;
@@ -94,6 +95,28 @@ public class UserProcessor {
             response.setHeader(ResponseStatus.OK, ContentType.HTML);
         } catch (NoResponseBodyException e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    @GetMapping("/list")
+    public void getUserList(HttpRequest request, HttpResponse response) {
+        User user = ProcessorUtil.checkCookieAndSession(request);
+
+        //로그인 되어있지 않을때 로그인페이지로 이동
+        if (user == null) {
+            response.setBody(Paths.STATIC_RESOURCES + Paths.LOGIN_DIR + Paths.DEFAULT_FILE);
+            try {
+                response.setHeader(ResponseStatus.OK, ContentType.HTML);
+            } catch (NoResponseBodyException e) {
+                logger.error(e.getMessage());
+            }
+        }else {
+            response.setLoginListBody(Paths.STATIC_RESOURCES + "/user_list.html");
+            try {
+                response.setHeader(ResponseStatus.OK, ContentType.HTML);
+            } catch (NoResponseBodyException e) {
+                logger.error(e.getMessage());
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ public enum DynamicHTMLMapper {
 
     DYNAMIC_LOGIN_CODE("<!-- DynamicLogin -->"),
     ADD_USERNAME_CODE("<!-- USER_NAME -->"),
+    ADD_ALL_USERS_CODE("<!-- ADD_USER -->"),
     WELCOME_PAGE_LOGIN("<a class=\"btn btn_contained btn_size_s\" href=\"/user/logout\">로그아웃</a>");
 
     private String value;

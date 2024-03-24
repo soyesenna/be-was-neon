@@ -1,17 +1,18 @@
 package response.data;
 
+import db.Database;
 import exceptions.NoResponseBodyException;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import response.util.DynamicHTMLMapper;
 import response.util.ResponseStatus;
 import utils.ContentType;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URLDecoder;
+import java.util.Collection;
+import java.util.UUID;
 
 import static utils.StringUtils.DEFAULT_URL;
 import static utils.StringUtils.appendHttpEndLine;
@@ -128,6 +129,41 @@ public class HttpResponse {
 
         this.body = sb.toString().getBytes();
         this.hasBody = true;
+    }
+
+    public void setLoginListBody(String urlPath){
+        Collection<User> users = Database.findAll();
+
+        StringBuilder listHTML = new StringBuilder();
+        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(urlPath)))) {
+            fileReader.lines()
+                    .forEach(string -> {
+                        if (string.contains(DynamicHTMLMapper.ADD_ALL_USERS_CODE.getValue())) {
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("<tr>");
+                            for (User user : users) {
+                                String decodeName = "";
+                                try {
+                                     decodeName = URLDecoder.decode(user.getName(), "UTF-8");
+                                } catch (UnsupportedEncodingException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                sb.append("<th>").append(user.getUserId()).append("</th>");
+                                sb.append("<th>").append(user.getPassword()).append("</th>");
+                                sb.append("<th>").append(decodeName).append("</th>");
+                                sb.append("<th>").append(user.getEmail()).append("</th>");
+                            }
+                            sb.append("</tr>");
+                            listHTML.append(appendHttpEndLine(sb.toString()));
+                        } else listHTML.append(appendHttpEndLine(string));
+                    });
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+
+        this.body = listHTML.toString().getBytes();
+        this.hasBody = true;
+
     }
 }
 
