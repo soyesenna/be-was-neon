@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Session {
-    private static final Map<String, User> sessionStore = new HashMap<>();
+    private static Map<String, User> sessionStore = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(Session.class);
     public static final String COOKIE_SESSION_ID = "sid";
 
@@ -31,5 +31,9 @@ public class Session {
 
     public static void deleteSessionById(String id) {
         sessionStore.remove(id);
+    }
+
+    public static void clear() {
+        sessionStore = new HashMap<>();
     }
 }

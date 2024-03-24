@@ -16,14 +16,16 @@ import response.util.ResponseStatus;
 import utils.ContentType;
 import utils.HTTPMethods;
 import java.util.Map;
+import java.util.UUID;
 
 public class UserProcessorTest {
 
     private UserProcessor userProcessor;
 
     @BeforeEach
-    void before() throws Exception{
+    void before() throws Exception {
         userProcessor = UserProcessor.getInstance();
+        Session.clear();
     }
 
     @Test
@@ -70,4 +72,30 @@ public class UserProcessorTest {
         assertThat(Session.getSessionSize()).isEqualTo(1);
     }
 
+    @Test
+    @DisplayName("로그아웃시 세션에서 유저 정보 삭제")
+    void logout() {
+        User user = new User("kim", "1234", "김주영", "a@naver.com");
+        //db에 추가
+        Database.addUser(user);
+
+        //세션에 추가
+        String uuid = UUID.randomUUID().toString();
+        Session.addSession(uuid, user);
+
+        //추가됐는지 확인
+        assertThat(Session.getSessionSize()).isEqualTo(1);
+
+        HttpRequest request = new HttpRequest(HTTPMethods.GET, "/user/logout", ContentType.HTML);
+        //삭제할 쿠키정보 추가
+        request.addCookie("sid=" + uuid + "; max-age=0");
+        HttpResponse response = new HttpResponse();
+
+        userProcessor.logout(request, response);
+
+        //세션에서 삭제됐는지 확인
+        assertThat(Session.getSessionSize()).isEqualTo(0);
+        //삭제된 아이디로 가져오면 null반환
+        assertThat(Session.getUserBySessionId(uuid)).isNull();
+    }
 }
