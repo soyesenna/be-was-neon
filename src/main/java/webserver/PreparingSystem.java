@@ -31,7 +31,7 @@ public class PreparingSystem {
 
     private static void scan() throws Exception{
         logger.info("Annotation Scan Start");
-        File root = new File("./build/classes/java/main/");
+        File root = new File("./src/main/java/");
         List<Class> classes = findClasses(root, "");
 
         Properties properties = Properties.getInstance();
@@ -94,9 +94,9 @@ public class PreparingSystem {
             if (file.isDirectory()) {
                 assert !file.getName().contains(".");
                 classes.addAll(findClasses(file, packageName + "." + file.getName()));
-            } else if (file.getName().endsWith(".class")) {
-                String path = file.getPath().replaceAll("./build/classes/java/main", "");
-                path = path.substring(1, path.length() - 6).replace('/', '.');
+            } else if (file.getName().endsWith(".java")) {
+                String path = file.getPath().replaceAll("./src/main/java", "");
+                path = path.substring(1, path.length() - 5).replace('/', '.');
 
                 classes.add(Class.forName(path));
             }
