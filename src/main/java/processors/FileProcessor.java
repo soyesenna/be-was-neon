@@ -1,7 +1,5 @@
 package processors;
 
-import db.Database;
-import db.Session;
 import exceptions.NoResponseBodyException;
 import model.User;
 import org.slf4j.Logger;

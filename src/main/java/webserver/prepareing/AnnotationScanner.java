@@ -1,14 +1,7 @@
-package webserver;
+package webserver.prepareing;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-
 import property.Properties;
 import property.Property;
 import property.RunnableMethod;
@@ -17,23 +10,27 @@ import property.annotations.PostMapping;
 import property.annotations.Processor;
 import utils.HTTPMethods;
 
-public class PreparingSystem {
-    private static final Logger logger = LoggerFactory.getLogger(PreparingSystem.class);
+import java.io.File;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
-    public static void main(String[] args) throws Exception{
-        scan();
+public class AnnotationScanner {
+    private static final Logger logger = LoggerFactory.getLogger(AnnotationScanner.class);
 
-        logger.info("WebServer Start!!");
-        WebServer webServer = new WebServer();
-        webServer.start(args);
 
-    }
-
-    private static void scan() throws Exception{
+    public static void scan() throws Exception{
         logger.info("Annotation Scan Start");
         File root = new File("./src/main/java/");
         List<Class> classes = findClasses(root, "");
 
+        addProperties(classes);
+
+        logger.info("Annotation Scan Done");
+    }
+
+
+    private static void addProperties(List<Class> classes) throws Exception{
         Properties properties = Properties.getInstance();
         Class<Properties> propertyClass = Properties.class;
         Method addProperty = propertyClass.getDeclaredMethod("addProperty", Property.class, RunnableMethod.class);
@@ -70,11 +67,7 @@ public class PreparingSystem {
                 }
             }
         }
-
-
-        logger.info("Annotation Scan Done");
     }
-
 
 
     /**
