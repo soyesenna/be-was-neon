@@ -2,7 +2,6 @@ package processors;
 
 
 import db.Session;
-import exceptions.NoResponseBodyException;
 import processors.util.ProcessorUtil;
 import property.annotations.GetMapping;
 import property.annotations.PostMapping;
@@ -47,11 +46,7 @@ public class UserProcessor {
         );
         logger.debug("회원가입 완료 : {}", Database.findUserById(body.get(USERID.getFiled())));
 
-        try {
-            response.setHeader(ResponseStatus.REDIRECT, ContentType.NONE);
-        } catch (NoResponseBodyException e) {
-            e.getMessage();
-        }
+        response.setHeader(ResponseStatus.REDIRECT, ContentType.NONE);
     }
 
     @PostMapping("/login")
@@ -63,22 +58,14 @@ public class UserProcessor {
         if (userById == null || !userById.getPassword().equals(body.get(PASSWORD.getFiled()))) {
             String loginFailHTML = Paths.STATIC_RESOURCES + "/login/login_fail.html";
             response.setBody(loginFailHTML);
-            try {
-                response.setHeader(ResponseStatus.OK, ContentType.HTML);
-            } catch (NoResponseBodyException e) {
-                logger.error(e.getMessage());
-            }
+            response.setHeader(ResponseStatus.OK, ContentType.HTML);
             //login success
         } else {
             String userSessionId = UUID.randomUUID().toString();
             //session에 추가
             Session.addSession(userSessionId, userById);
             response.setCookie(userSessionId);
-            try {
-                response.setHeader(ResponseStatus.REDIRECT, ContentType.NONE);
-            } catch (NoResponseBodyException e) {
-                logger.error(e.getMessage());
-            }
+            response.setHeader(ResponseStatus.REDIRECT, ContentType.NONE);
         }
     }
 
@@ -89,13 +76,9 @@ public class UserProcessor {
         //세션에서 유저 정보 삭제
         Session.deleteSessionById(sessionId);
 
-        try {
-            response.deleteCookie(sessionId);
-            response.setBody(Paths.STATIC_RESOURCES + Paths.DEFAULT_FILE);
-            response.setHeader(ResponseStatus.OK, ContentType.HTML);
-        } catch (NoResponseBodyException e) {
-            logger.error(e.getMessage());
-        }
+        response.deleteCookie(sessionId);
+        response.setBody(Paths.STATIC_RESOURCES + Paths.DEFAULT_FILE);
+        response.setHeader(ResponseStatus.OK, ContentType.HTML);
     }
 
     @GetMapping("/list")
@@ -105,18 +88,10 @@ public class UserProcessor {
         //로그인 되어있지 않을때 로그인페이지로 이동
         if (user == null) {
             response.setBody(Paths.STATIC_RESOURCES + Paths.LOGIN_DIR + Paths.DEFAULT_FILE);
-            try {
-                response.setHeader(ResponseStatus.OK, ContentType.HTML);
-            } catch (NoResponseBodyException e) {
-                logger.error(e.getMessage());
-            }
+            response.setHeader(ResponseStatus.OK, ContentType.HTML);
         }else {
             response.setLoginListBody(Paths.STATIC_RESOURCES + "/user_list.html");
-            try {
-                response.setHeader(ResponseStatus.OK, ContentType.HTML);
-            } catch (NoResponseBodyException e) {
-                logger.error(e.getMessage());
-            }
+            response.setHeader(ResponseStatus.OK, ContentType.HTML);
         }
     }
 }

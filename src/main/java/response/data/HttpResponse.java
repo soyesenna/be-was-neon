@@ -1,7 +1,6 @@
 package response.data;
 
 import db.Database;
-import exceptions.NoResponseBodyException;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +11,6 @@ import utils.ContentType;
 import java.io.*;
 import java.net.URLDecoder;
 import java.util.Collection;
-import java.util.UUID;
 
 import static utils.StringUtils.DEFAULT_URL;
 import static utils.StringUtils.appendHttpEndLine;
@@ -63,16 +61,15 @@ public class HttpResponse {
         this.hasCookie = true;
     }
 
-    public void setHeader(ResponseStatus status, ContentType type) throws NoResponseBodyException{
+    public void setHeader(ResponseStatus status, ContentType type){
         StringBuilder sb = new StringBuilder();
 
         sb.append(appendHttpEndLine(status.getCode()));
         switch (status) {
             case OK -> {
-                if (!this.hasBody) throw new NoResponseBodyException();
                 sb.append(appendHttpEndLine("Content-Type: " + type.getType()));
                 sb.append(appendHttpEndLine("Content-Length: " + this.body.length));
-            }
+        }
             case REDIRECT -> {
                 sb.append(appendHttpEndLine("Location: " + DEFAULT_URL));
             }

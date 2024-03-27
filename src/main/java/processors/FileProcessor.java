@@ -1,6 +1,5 @@
 package processors;
 
-import exceptions.NoResponseBodyException;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,20 +70,12 @@ public class FileProcessor {
 
     private void setResponse(HttpRequest request, HttpResponse response, String filePath, String userId) {
         response.setBodyInLogin(filePath, userId);
-        try {
-            response.setHeader(ResponseStatus.OK, request.getContentType());
-        } catch (NoResponseBodyException e) {
-            logger.error(e.getMessage());
-        }
+        response.setHeader(ResponseStatus.OK, request.getContentType());
     }
 
     private void setResponse(HttpRequest request, HttpResponse response, String filePath) {
         response.setBody(filePath);
-        try {
-            response.setHeader(ResponseStatus.OK, request.getContentType());
-        } catch (NoResponseBodyException e) {
-            logger.error(e.getMessage());
-        }
+        response.setHeader(ResponseStatus.OK, request.getContentType());
     }
 
 
