@@ -10,7 +10,6 @@ import java.util.Map;
 public class Session {
     private static Map<String, User> sessionStore = new HashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(Session.class);
-    public static final String COOKIE_SESSION_ID = "sid";
 
     public static void addSession(String id, User user) {
         sessionStore.put(id, user);

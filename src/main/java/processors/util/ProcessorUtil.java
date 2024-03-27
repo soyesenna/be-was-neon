@@ -11,6 +11,7 @@ import request.data.HttpRequest;
 public class ProcessorUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessorUtil.class);
+    public static final String COOKIE_SESSION_ID = "sid";
 
     private ProcessorUtil() {
 

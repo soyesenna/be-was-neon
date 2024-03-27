@@ -84,7 +84,7 @@ public class UserProcessor {
 
     @GetMapping("/logout")
     public void logout(HttpRequest request, HttpResponse response) {
-        String sessionId = request.getCookie().get(Session.COOKIE_SESSION_ID);
+        String sessionId = request.getCookie().get(ProcessorUtil.COOKIE_SESSION_ID);
 
         //세션에서 유저 정보 삭제
         Session.deleteSessionById(sessionId);
