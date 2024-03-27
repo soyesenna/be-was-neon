@@ -75,4 +75,13 @@ public class FileProcessor {
         response.setBody(filePath);
     }
 
+    @GetMapping("/post")
+    @Status(ResponseStatus.OK)
+    public void articlePostPage(HttpRequest request, HttpResponse response) {
+        logger.debug("Postpage Call");
+        String filePath = STATIC_RESOURCES + "/article" + DEFAULT_FILE;
+
+        response.setBody(filePath);
+    }
+
 }
