@@ -3,7 +3,6 @@ package db;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import processors.FileProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
