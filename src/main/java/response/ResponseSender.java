@@ -7,6 +7,8 @@ import utils.StringUtils;
 
 import java.io.*;
 
+import static utils.StringUtils.CRLF;
+
 public class ResponseSender {
     private static final Logger logger = LoggerFactory.getLogger(ResponseSender.class);
 
@@ -19,13 +21,13 @@ public class ResponseSender {
     }
 
     public void doResponse() throws IOException{
-        dos.write(response.getHeader().getBytes());
-        dos.writeBytes(StringUtils.END_OF_HTTP_LINE);
-        if (response.hasBody()) dos.write(response.getBody());
-        dos.flush();
-
+        logger.debug("doResponse Called");
         logger.debug(response.getHeader());
-        logger.info("Send Response");
+        dos.writeBytes(response.getHeader());
+        dos.writeBytes(CRLF);
+        logger.debug("header response done");
+        if (response.getBody().length != 0) dos.write(response.getBody());
+        dos.flush();
     }
 }
 

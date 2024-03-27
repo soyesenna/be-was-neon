@@ -6,4 +6,5 @@ public class Paths {
     public static final String ROOT_PATH = "./src/main";
     public static final String DEFAULT_FILE = "/index.html";
     public static final String LOGIN_DIR = "/login";
+    public static final String TEMPLATE_PATH = "./src/main/resources/templates";
 }

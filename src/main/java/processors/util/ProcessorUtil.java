@@ -17,6 +17,8 @@ public class ProcessorUtil {
 
     }
 
+    //Processor들에서 사용하는 메서드
+    //요청으로 들어온 sid쿠키가 유효한지, 세션에 존재하는지 검사한다
     public static User checkCookieAndSession(HttpRequest request) {
         if (request.getCookie().isEmpty()) return null;
         if (!request.getCookie().containsKey(COOKIE_SESSION_ID)) return null;
@@ -26,9 +28,9 @@ public class ProcessorUtil {
         logger.debug(sessionId);
         try {
             User userBySessionId = Session.getUserBySessionId(sessionId);
-            logger.debug("세션에서 유저 찾음");
             User userByIdInDB = Database.findUserById(userBySessionId.getUserId());
-            logger.debug("db에서 유저 찾음");
+
+            logger.debug("세션과 db에서 유저 찾음");
 
             return userBySessionId.equals(userByIdInDB) ? userBySessionId : null;
         }catch (IndexOutOfBoundsException | NullPointerException e) {

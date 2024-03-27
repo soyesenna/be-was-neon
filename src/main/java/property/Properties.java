@@ -23,12 +23,12 @@ public class Properties {
 
     public MappedService getProcessingMethodByProperty(Property property) {
         MappedService mappedService = propertyMapping.get(property);
-        if (mappedService == null) {
-            //매핑된 url이 없을 경우 파일요청으로 간주
-            // static file processor 응답
-            mappedService = propertyMapping.get(Property.of(HTTPMethods.GET, "."));
-        }
+
         return mappedService;
+    }
+
+    public MappedService getFileProcessingProperty() {
+        return propertyMapping.get(Property.of(HTTPMethods.GET, "."));
     }
 
 }

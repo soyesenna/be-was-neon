@@ -11,19 +11,30 @@ import property.annotations.Processor;
 import utils.HTTPMethods;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AnnotationScanner {
     private static final Logger logger = LoggerFactory.getLogger(AnnotationScanner.class);
-
+    private static Method addProperty;
+    private static Properties properties;
 
     public static void scan() throws Exception{
         logger.info("Annotation Scan Start");
+        //모든 클래스 탐색
         File root = new File("./src/main/java/");
         List<Class> classes = findClasses(root, "");
 
+        //propertis 클래스 가져옴
+        properties = Properties.getInstance();
+        Class<Properties> propertyClass = Properties.class;
+        //프로퍼티를 추가하는 addProperty 메서드 가져옴
+        addProperty = propertyClass.getDeclaredMethod("addProperty", Property.class, MappedService.class);
+        addProperty.setAccessible(true);
+
+        //프로퍼티 추가 시작
         addProperties(classes);
 
         logger.info("Annotation Scan Done");
@@ -31,40 +42,37 @@ public class AnnotationScanner {
 
 
     private static void addProperties(List<Class> classes) throws Exception{
-        Properties properties = Properties.getInstance();
-        Class<Properties> propertyClass = Properties.class;
-        Method addProperty = propertyClass.getDeclaredMethod("addProperty", Property.class, MappedService.class);
-        addProperty.setAccessible(true);
-
         for (Class clazz :classes){
-
             //Processor annotation이 붙어있는 클래스 탐색
             if (clazz.isAnnotationPresent(Processor.class)) {
-                Processor processor = (Processor) clazz.getAnnotation(Processor.class);
+                createProperty(clazz);
+            }
+        }
+    }
 
-                //Processor annotation이 붙어있는 클래스의 멤버 메서드 중
-                //PostMapping, GetMapping이 붙어있는 메서드 탐색
-                for (Method method : clazz.getDeclaredMethods()) {
-                    StringBuilder path = new StringBuilder();
+    private static void createProperty(Class clazz) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Processor processor = (Processor) clazz.getAnnotation(Processor.class);
+        //Processor annotation이 붙어있는 클래스의 멤버 메서드 중
+        //PostMapping, GetMapping이 붙어있는 메서드 탐색
+        for (Method method : clazz.getDeclaredMethods()) {
+            StringBuilder path = new StringBuilder();
 
-                    //class에 붙어있는 경로도 함께 저장
-                    path.append(processor.value());
+            //class에 붙어있는 경로도 함께 저장
+            path.append(processor.value());
 
-                    //http method와 url path로 Property를 만든 후 properties에 저장
-                    if (method.isAnnotationPresent(GetMapping.class)) {
-                        GetMapping getMapping = method.getAnnotation(GetMapping.class);
-                        path.append(getMapping.value());
+            //http method와 url path로 Property를 만든 후 properties에 저장
+            if (method.isAnnotationPresent(GetMapping.class)) {
+                GetMapping getMapping = method.getAnnotation(GetMapping.class);
+                path.append(getMapping.value());
 
-                        Property property = Property.of(HTTPMethods.GET, path.toString());
-                        addProperty.invoke(properties, property, new MappedService(clazz.getMethod("getInstance"), method));
-                    } else if (method.isAnnotationPresent(PostMapping.class)) {
-                        PostMapping postMapping = method.getAnnotation(PostMapping.class);
-                        path.append(postMapping.value());
+                Property property = Property.of(HTTPMethods.GET, path.toString());
+                addProperty.invoke(properties, property, new MappedService(clazz.getMethod("getInstance"), method));
+            } else if (method.isAnnotationPresent(PostMapping.class)) {
+                PostMapping postMapping = method.getAnnotation(PostMapping.class);
+                path.append(postMapping.value());
 
-                        Property property = Property.of(HTTPMethods.POST, path.toString());
-                        addProperty.invoke(properties, property, new MappedService(clazz.getMethod("getInstance"), method));
-                    }
-                }
+                Property property = Property.of(HTTPMethods.POST, path.toString());
+                addProperty.invoke(properties, property, new MappedService(clazz.getMethod("getInstance"), method));
             }
         }
     }

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import processors.util.ProcessorUtil;
 import property.annotations.GetMapping;
 import property.annotations.Processor;
+import property.annotations.Status;
 import request.data.HttpRequest;
 import response.data.HttpResponse;
 import response.util.ResponseStatus;
@@ -30,53 +31,48 @@ public class FileProcessor {
     }
 
     @GetMapping(".")
+    @Status(ResponseStatus.OK)
     public void responseFile(HttpRequest request, HttpResponse response) {
         logger.debug("ResponseFile Call");
         String path = Paths.STATIC_RESOURCES + request.getURL();
 
-        setResponse(request, response, path);
+        response.setBody(path);
     }
 
     @GetMapping("/login")
+    @Status(ResponseStatus.OK)
     public void loginPage(HttpRequest request, HttpResponse response) {
         logger.debug("LoginPage Call");
         String filePath = Paths.STATIC_RESOURCES + request.getURL() + DEFAULT_FILE;
 
-        setResponse(request, response, filePath);
+        response.setBody(filePath);
     }
 
     @GetMapping("/")
+    @Status(ResponseStatus.OK)
     public void welcomePage(HttpRequest request, HttpResponse response) {
         logger.debug("WelcomePage Call");
-        String filePath = Paths.STATIC_RESOURCES + request.getURL() + DEFAULT_FILE.substring(1);
 
         User checkSession = ProcessorUtil.checkCookieAndSession(request);
         if (checkSession != null) {
             logger.debug("login welcome page");
-            setResponse(request, response, filePath, checkSession.getName());
+
+            response.addAttribute("USER_NAME", checkSession.getName());
+            response.setBody(TEMPLATE_PATH + "/main" + DEFAULT_FILE);
+
         } else {
+            response.setBody(STATIC_RESOURCES + DEFAULT_FILE);
             logger.debug("No login welcome page");
-            setResponse(request, response, filePath);
         }
     }
 
     @GetMapping("/registration")
+    @Status(ResponseStatus.OK)
     public void registerPage(HttpRequest request, HttpResponse response) {
         logger.debug("RegisterPage Call");
         String filePath = Paths.STATIC_RESOURCES + request.getURL() + DEFAULT_FILE;
 
-        setResponse(request, response, filePath);
-    }
-
-    private void setResponse(HttpRequest request, HttpResponse response, String filePath, String userId) {
-        response.setBodyInLogin(filePath, userId);
-        response.setHeader(ResponseStatus.OK, request.getContentType());
-    }
-
-    private void setResponse(HttpRequest request, HttpResponse response, String filePath) {
         response.setBody(filePath);
-        response.setHeader(ResponseStatus.OK, request.getContentType());
     }
-
 
 }

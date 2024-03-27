@@ -15,7 +15,7 @@ import utils.StringUtils;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class FileProcessorTest {
 
@@ -31,14 +31,14 @@ public class FileProcessorTest {
         StringBuilder sb = new StringBuilder();
         BufferedReader reader = new BufferedReader(new FileReader(Paths.STATIC_RESOURCES + "/registration/index.html"));
         reader.lines()
-                .forEach(string -> sb.append(StringUtils.appendHttpEndLine(string)));
+                .forEach(string -> sb.append(StringUtils.appendCRLF(string)));
         registerPage = sb.toString().getBytes();
 
         //welcome page init
         StringBuilder sb2 = new StringBuilder();
         reader = new BufferedReader(new FileReader(Paths.STATIC_RESOURCES + "/index.html"));
         reader.lines()
-                .forEach(string -> sb2.append(StringUtils.appendHttpEndLine(string)));
+                .forEach(string -> sb2.append(StringUtils.appendCRLF(string)));
         welcomePage = sb2.toString().getBytes();
     }
 

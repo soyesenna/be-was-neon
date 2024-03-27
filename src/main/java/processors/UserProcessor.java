@@ -10,16 +10,16 @@ import db.Database;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import property.annotations.Status;
 import request.data.HttpRequest;
 import response.data.HttpResponse;
 import response.util.ResponseStatus;
-import utils.ContentType;
 import utils.Paths;
 
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static model.UserFiled.*;
+import static utils.Paths.*;
 
 @Processor("/user")
 public class UserProcessor {
@@ -45,7 +45,7 @@ public class UserProcessor {
                         body.get(EMAIL.getFiled()))
         );
 
-        response.setHeader(ResponseStatus.REDIRECT, ContentType.NONE);
+        response.setStatus302Found(DEFAULT_FILE);
     }
 
     @PostMapping("/login")
@@ -54,17 +54,19 @@ public class UserProcessor {
 
         User userById = Database.findUserById(body.get(USERID.getFiled()));
         //login fail
-        if (userById == null || userById.equalToPassword(body.get(PASSWORD.getFiled()))) {
+        if (userById == null || !userById.equalToPassword(body.get(PASSWORD.getFiled()))) {
             String loginFailHTML = Paths.STATIC_RESOURCES + "/login/login_fail.html";
+            response.setStatus200OK();
             response.setBody(loginFailHTML);
-            response.setHeader(ResponseStatus.OK, ContentType.HTML);
         //login success
         } else {
             String userSessionId = UUID.randomUUID().toString();
             //session에 추가
             Session.addSession(userSessionId, userById);
+            response.addAttribute("USER_NAME", userById.getName());
+
+            response.setStatus302Found("/");
             response.setCookie(userSessionId);
-            response.setHeader(ResponseStatus.REDIRECT, ContentType.NONE);
         }
     }
 
@@ -75,22 +77,21 @@ public class UserProcessor {
         //세션에서 유저 정보 삭제
         Session.deleteSessionById(sessionId);
 
+        response.setStatus302Found("/");
         response.deleteCookie(sessionId);
-        response.setBody(Paths.STATIC_RESOURCES + Paths.DEFAULT_FILE);
-        response.setHeader(ResponseStatus.OK, ContentType.HTML);
     }
 
     @GetMapping("/list")
+    @Status(ResponseStatus.OK)
     public void getUserList(HttpRequest request, HttpResponse response) {
         User user = ProcessorUtil.checkCookieAndSession(request);
 
         //로그인 되어있지 않을때 로그인페이지로 이동
         if (user == null) {
             response.setBody(Paths.STATIC_RESOURCES + Paths.LOGIN_DIR + Paths.DEFAULT_FILE);
-            response.setHeader(ResponseStatus.OK, ContentType.HTML);
         }else {
-            response.setLoginListBody(Paths.STATIC_RESOURCES + "/user_list.html");
-            response.setHeader(ResponseStatus.OK, ContentType.HTML);
+            response.addAttribute("USER_LIST", Database.findAll().stream().toList());
+            response.setBody(TEMPLATE_PATH + "/user_list.html");
         }
     }
 }
