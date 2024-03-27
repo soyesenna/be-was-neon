@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import property.Properties;
 import property.Property;
-import property.RunnableMethod;
+import property.MappedService;
 import property.annotations.GetMapping;
 import property.annotations.PostMapping;
 import property.annotations.Processor;
@@ -33,7 +33,7 @@ public class AnnotationScanner {
     private static void addProperties(List<Class> classes) throws Exception{
         Properties properties = Properties.getInstance();
         Class<Properties> propertyClass = Properties.class;
-        Method addProperty = propertyClass.getDeclaredMethod("addProperty", Property.class, RunnableMethod.class);
+        Method addProperty = propertyClass.getDeclaredMethod("addProperty", Property.class, MappedService.class);
         addProperty.setAccessible(true);
 
         for (Class clazz :classes){
@@ -56,13 +56,13 @@ public class AnnotationScanner {
                         path.append(getMapping.value());
 
                         Property property = Property.of(HTTPMethods.GET, path.toString());
-                        addProperty.invoke(properties, property, new RunnableMethod(clazz.getMethod("getInstance"), method));
+                        addProperty.invoke(properties, property, new MappedService(clazz.getMethod("getInstance"), method));
                     } else if (method.isAnnotationPresent(PostMapping.class)) {
                         PostMapping postMapping = method.getAnnotation(PostMapping.class);
                         path.append(postMapping.value());
 
                         Property property = Property.of(HTTPMethods.POST, path.toString());
-                        addProperty.invoke(properties, property, new RunnableMethod(clazz.getMethod("getInstance"), method));
+                        addProperty.invoke(properties, property, new MappedService(clazz.getMethod("getInstance"), method));
                     }
                 }
             }

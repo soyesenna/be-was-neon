@@ -29,6 +29,10 @@ public class User {
         return email;
     }
 
+    public boolean equalToPassword(String password) {
+        return password.contentEquals(this.password);
+    }
+
     @Override
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";

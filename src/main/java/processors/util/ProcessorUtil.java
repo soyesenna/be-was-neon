@@ -19,10 +19,10 @@ public class ProcessorUtil {
 
     public static User checkCookieAndSession(HttpRequest request) {
         if (request.getCookie().isEmpty()) return null;
-        if (!request.getCookie().containsKey(Session.COOKIE_SESSION_ID)) return null;
+        if (!request.getCookie().containsKey(COOKIE_SESSION_ID)) return null;
 
         //쿠키를 파싱하고 세션에 등록된경우 User 반환
-        String sessionId = request.getCookie().get(Session.COOKIE_SESSION_ID);
+        String sessionId = request.getCookie().get(COOKIE_SESSION_ID);
         logger.debug(sessionId);
         try {
             User userBySessionId = Session.getUserBySessionId(sessionId);

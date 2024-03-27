@@ -44,7 +44,6 @@ public class UserProcessor {
                         body.get(NAME.getFiled()),
                         body.get(EMAIL.getFiled()))
         );
-        logger.debug("회원가입 완료 : {}", Database.findUserById(body.get(USERID.getFiled())));
 
         response.setHeader(ResponseStatus.REDIRECT, ContentType.NONE);
     }
@@ -55,11 +54,11 @@ public class UserProcessor {
 
         User userById = Database.findUserById(body.get(USERID.getFiled()));
         //login fail
-        if (userById == null || !userById.getPassword().equals(body.get(PASSWORD.getFiled()))) {
+        if (userById == null || userById.equalToPassword(body.get(PASSWORD.getFiled()))) {
             String loginFailHTML = Paths.STATIC_RESOURCES + "/login/login_fail.html";
             response.setBody(loginFailHTML);
             response.setHeader(ResponseStatus.OK, ContentType.HTML);
-            //login success
+        //login success
         } else {
             String userSessionId = UUID.randomUUID().toString();
             //session에 추가

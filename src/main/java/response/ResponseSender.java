@@ -6,7 +6,6 @@ import response.data.HttpResponse;
 import utils.StringUtils;
 
 import java.io.*;
-import java.util.Arrays;
 
 public class ResponseSender {
     private static final Logger logger = LoggerFactory.getLogger(ResponseSender.class);

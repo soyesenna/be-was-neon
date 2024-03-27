@@ -6,7 +6,7 @@ import java.net.Socket;
 
 import property.Properties;
 import property.Property;
-import property.RunnableMethod;
+import property.MappedService;
 import request.data.HttpRequest;
 import request.RequestReader;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public class Repeater implements Runnable {
             HttpResponse response = new HttpResponse();
 
             //현재 요청에 대한 processor 가져옴
-            RunnableMethod nowProcessor = properties.getProcessingMethodByProperty(Property.of(request.getMethods(), request.getURL()));
+            MappedService nowProcessor = properties.getProcessingMethodByProperty(Property.of(request.getMethods(), request.getURL()));
             //url에 따른 요청 실행
             methodInvoke(nowProcessor, request, response);
             logger.debug("Processing Done");
@@ -59,7 +59,7 @@ public class Repeater implements Runnable {
         }
     }
 
-    private void methodInvoke(RunnableMethod nowProcessor, HttpRequest request, HttpResponse response) throws InvocationTargetException, IllegalAccessException {
+    private void methodInvoke(MappedService nowProcessor, HttpRequest request, HttpResponse response) throws InvocationTargetException, IllegalAccessException {
         nowProcessor.method().invoke(nowProcessor.instance().invoke(null), request, response);
     }
 
