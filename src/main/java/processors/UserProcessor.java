@@ -84,7 +84,7 @@ public class UserProcessor {
     @GetMapping("/list")
     @Status(ResponseStatus.OK)
     public void getUserList(HttpRequest request, HttpResponse response) {
-        User user = ProcessorUtil.checkCookieAndSession(request);
+        User user = ProcessorUtil.getUserByCookieInSession(request);
 
         //로그인 되어있지 않을때 로그인페이지로 이동
         if (user == null) {

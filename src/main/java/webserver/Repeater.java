@@ -3,6 +3,7 @@ package webserver;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 import processors.ProcessorHandler;
 import request.data.HttpRequest;
@@ -27,7 +28,7 @@ public class Repeater implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            HttpRequest request;
+            HttpRequest request = new HttpRequest();
             //요청을 읽고 파싱
             RequestReader reader = new RequestReader(new BufferedReader(new InputStreamReader(in)));
             request = reader.readHttpRequest();

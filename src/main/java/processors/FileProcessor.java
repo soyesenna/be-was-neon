@@ -53,7 +53,7 @@ public class FileProcessor {
     public void welcomePage(HttpRequest request, HttpResponse response) {
         logger.debug("WelcomePage Call");
 
-        User checkSession = ProcessorUtil.checkCookieAndSession(request);
+        User checkSession = ProcessorUtil.getUserByCookieInSession(request);
         if (checkSession != null) {
             logger.debug("login welcome page");
 

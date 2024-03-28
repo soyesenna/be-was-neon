@@ -6,8 +6,10 @@ import utils.HTTPMethods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,9 +62,11 @@ public class RequestReader {
             httpRequest.put(tmp[0], value);
         }
 
+        logger.debug(httpRequest.toString());
+
         logger.debug("Request Header Read");
         //body
-        if (httpRequest.get(METHOD).equals(HTTPMethods.POST.name())) {
+        if (httpRequest.get(CONTENT_LENGTH) != null) {
             int bodyLength = Integer.parseInt(httpRequest.get(CONTENT_LENGTH));
 
             StringBuilder sb = new StringBuilder();
@@ -72,6 +76,7 @@ public class RequestReader {
 
             logger.debug("Request Body Read");
         }
+        logger.debug(httpRequest.get(BODY));
 
         return httpRequest;
     }
