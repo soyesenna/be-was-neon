@@ -10,15 +10,13 @@ public class HttpRequest {
 
     private final HTTPMethods methods;
     private String URL;
-    private final ContentType contentType;
-    private final Map<String, String> body;
+    private ContentType contentType;
+    private Map<String, String> body; //name=value
     private Map<String, String> cookie;
 
-    public HttpRequest(HTTPMethods methods, String url, Map<String, String> body, ContentType contentType) {
+    public HttpRequest(HTTPMethods methods, String url) {
         this.methods = methods;
         this.URL = url;
-        this.body = body;
-        this.contentType = contentType;
         this.cookie = new HashMap<>();
     }
 
@@ -61,6 +59,14 @@ public class HttpRequest {
             String[] tmp = nowCookie.split("=");
             this.cookie.put(tmp[0], tmp[1]);
         }
+    }
+
+    public void setBody(Map<String, String> body) {
+        this.body = body;
+    }
+
+    public void setContentType(ContentType type) {
+        this.contentType = type;
     }
 
     public Map<String, String> getCookie() {

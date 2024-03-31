@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import processors.FileProcessor;
 import request.data.HttpRequest;
 import response.data.HttpResponse;
-import response.util.ResponseStatus;
+import response.util.HttpStatus;
 import utils.ContentType;
 import utils.HTTPMethods;
 import utils.Paths;
@@ -50,7 +50,7 @@ public class FileProcessorTest {
         HttpResponse response = new HttpResponse();
         fileProcessor.welcomePage(request, response);
 
-        assertThat(response.getHeader()).contains(ResponseStatus.OK.getCode());
+        assertThat(response.getHeader()).contains(HttpStatus.OK.getCode());
         assertThat(response.getBody()).isNotEmpty();
         assertThat(response.hasBody()).isTrue();
         assertThat(response.getBody()).isEqualTo(welcomePage);

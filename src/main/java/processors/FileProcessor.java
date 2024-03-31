@@ -6,10 +6,10 @@ import org.slf4j.LoggerFactory;
 import processors.util.ProcessorUtil;
 import property.annotations.GetMapping;
 import property.annotations.Processor;
-import property.annotations.Status;
+import property.annotations.ResponseStatus;
 import request.data.HttpRequest;
 import response.data.HttpResponse;
-import response.util.ResponseStatus;
+import response.util.HttpStatus;
 import utils.Paths;
 
 import static utils.Paths.*;
@@ -31,7 +31,7 @@ public class FileProcessor {
     }
 
     @GetMapping(".")
-    @Status(ResponseStatus.OK)
+    @ResponseStatus(HttpStatus.OK)
     public void responseFile(HttpRequest request, HttpResponse response) {
         logger.debug("ResponseFile Call");
         String path = Paths.STATIC_RESOURCES + request.getURL();
@@ -40,16 +40,16 @@ public class FileProcessor {
     }
 
     @GetMapping("/login")
-    @Status(ResponseStatus.OK)
+    @ResponseStatus(HttpStatus.OK)
     public void loginPage(HttpRequest request, HttpResponse response) {
         logger.debug("LoginPage Call");
-        String filePath = Paths.STATIC_RESOURCES + request.getURL() + DEFAULT_FILE;
+        String filePath = TEMPLATE_PATH + request.getURL() + DEFAULT_FILE;
 
         response.setBody(filePath);
     }
 
     @GetMapping("/")
-    @Status(ResponseStatus.OK)
+    @ResponseStatus(HttpStatus.OK)
     public void welcomePage(HttpRequest request, HttpResponse response) {
         logger.debug("WelcomePage Call");
 
@@ -67,7 +67,7 @@ public class FileProcessor {
     }
 
     @GetMapping("/registration")
-    @Status(ResponseStatus.OK)
+    @ResponseStatus(HttpStatus.OK)
     public void registerPage(HttpRequest request, HttpResponse response) {
         logger.debug("RegisterPage Call");
         String filePath = Paths.STATIC_RESOURCES + request.getURL() + DEFAULT_FILE;
@@ -75,13 +75,18 @@ public class FileProcessor {
         response.setBody(filePath);
     }
 
-    @GetMapping("/post")
-    @Status(ResponseStatus.OK)
+    @GetMapping("/feed")
+    @ResponseStatus(HttpStatus.OK)
     public void articlePostPage(HttpRequest request, HttpResponse response) {
         logger.debug("Postpage Call");
-        String filePath = STATIC_RESOURCES + "/article" + DEFAULT_FILE;
+        User user = ProcessorUtil.getUserByCookieInSession(request);
 
-        response.setBody(filePath);
+        if (user == null) {
+            response.setBody(TEMPLATE_PATH + "/login" + DEFAULT_FILE);
+        } else {
+            response.addAttribute("USER_NAME", user.getName());
+            response.setBody(TEMPLATE_PATH + request.getURL() + DEFAULT_FILE);
+        }
     }
 
 }

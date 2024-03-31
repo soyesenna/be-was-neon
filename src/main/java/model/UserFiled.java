@@ -18,7 +18,4 @@ public enum UserFiled {
         return filed;
     }
 
-    public static List<String> getFiledNames() {
-        return List.of(USERID.filed, PASSWORD.filed, NAME.filed, EMAIL.filed);
-    }
 }

@@ -20,6 +20,7 @@ public class DynamicHtmlResolver {
     private final String DYNAMIC_IDENTITY = "[DYNAMIC]";
     private final String ORDER_INSERT_LIST = "INSERT-LIST";
     private final String ORDER_INSERT = "INSERT";
+    private final String ORDER_INSERT_ERROR = "INSERT-ERROR";
     private final Map<String, Object> attributes;
 
     private Map<String, String > dataMapping = new HashMap<>();
@@ -70,6 +71,9 @@ public class DynamicHtmlResolver {
             } else if (order.contentEquals(ORDER_INSERT)) {
                 logger.debug("INSERT PROCESS");
                 result = insert();
+            } else if (order.contentEquals(ORDER_INSERT_ERROR)) {
+                logger.debug("INSERT ERROR PROCESS");
+                result = insertError();
             }
         } catch (NoSuchMethodException | InvocationTargetException |IllegalAccessException | UnsupportedEncodingException e) {
             logger.error(e.getMessage());
@@ -89,10 +93,25 @@ public class DynamicHtmlResolver {
         }
     }
 
+    private String insertError() {
+        Object roughAttribute = attributes.get(dataMapping.get("NAME"));
+        if (roughAttribute == null) return "";
+
+        StringBuilder html = new StringBuilder();
+        if (roughAttribute.getClass().getName().contains("String")) {
+            String errorMessage = (String) roughAttribute;
+            html.append("<p class=\"error-message\">").append(errorMessage).append("</p>");
+        }
+
+        return html.toString();
+    }
+
 
     private String insertList() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        StringBuilder html = new StringBuilder();
         Object roughAttribute = attributes.get(dataMapping.get("NAME"));
+        if (roughAttribute == null) return "";
+
+        StringBuilder html = new StringBuilder();
 
         List<User> users = new ArrayList<>();
 
@@ -129,6 +148,8 @@ public class DynamicHtmlResolver {
 
     private String insert() throws UnsupportedEncodingException {
         Object roughData = attributes.get(dataMapping.get("NAME"));
+        if (roughData == null) return "";
+
         String insetString = "";
 
         //String attibutes 처리

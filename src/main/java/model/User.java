@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Objects;
+
 public class User {
     private String userId;
     private String password;
@@ -45,5 +47,10 @@ public class User {
             return this.userId.equals(user.userId) && this.password.equals(user.password) && this.email.equals(user.email) && this.name.equals(user.name);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, password, name, email);
     }
 }

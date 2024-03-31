@@ -8,6 +8,7 @@ import property.MappedService;
 import property.annotations.GetMapping;
 import property.annotations.PostMapping;
 import property.annotations.Processor;
+import property.annotations.ResponseStatus;
 import utils.HTTPMethods;
 
 import java.io.File;
@@ -73,6 +74,10 @@ public class AnnotationScanner {
 
                 Property property = Property.of(HTTPMethods.POST, path.toString());
                 addProperty.invoke(properties, property, new MappedService(clazz.getMethod("getInstance"), method));
+            }
+
+            if (method.isAnnotationPresent(ResponseStatus.class)) {
+
             }
         }
     }

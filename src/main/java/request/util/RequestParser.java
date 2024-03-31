@@ -1,22 +1,26 @@
 package request.util;
 
-import utils.ContentType;
-import utils.HTTPMethods;
-import model.UserFiled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import request.RequestReader;
 import request.data.HttpRequest;
 import request.util.constant.RequestKeys;
+import utils.ContentType;
+import utils.HTTPMethods;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.security.cert.CRL;
 import java.util.*;
 
+import static request.util.constant.RequestKeys.*;
+import static utils.StringUtils.CRLF;
+
 public class RequestParser {
-    private static final String DEFAULT_URL = "/index.html";
-    private static final String FILE_SYMBOL = ".";
+
     private static final Logger logger = LoggerFactory.getLogger(RequestParser.class);
     private static final RequestParser instance = new RequestParser();
-    private static final String ILLEGAL_BODY_MESSAGE = "잘못된 body입니다";
+    private static final String FILE_SYMBOL = ".";
 
     private RequestParser() {
 
@@ -26,64 +30,82 @@ public class RequestParser {
         return instance;
     }
 
-    /**
-     * http method와 내용 파싱
-     * @param request
-     * @return
-     * @throws IOException
-     */
-    public HttpRequest getParsedHTTP(Map<String, String> request) throws IOException{
-        //유효하지 않은 http request일 경우 리턴될 객체
-        HttpRequest result = new HttpRequest();
+    public HttpRequest getParsedHTTP(Map<String, String> mappingRequest) {
+        HttpRequest request;
         try {
-            //유효한 http메서드인지 검사함
-            HTTPMethods methods = HTTPMethods.valueOf(request.get(RequestKeys.METHOD));
-
-            switch (methods) {
-                case GET -> result = parseGet(request);
-                case POST -> result = parsePost(request);
-            }
+            if (mappingRequest.containsKey(CONTENT_LENGTH)) {
+                request = parseWithBody(mappingRequest);
+            } else request = parseHeaderOnly(mappingRequest);
 
             //쿠키 있을경우
-            if (request.containsKey(RequestKeys.COOKIE)) {
-                result.addCookie(request.get(RequestKeys.COOKIE));
+            if (mappingRequest.containsKey(RequestKeys.COOKIE)) {
+                request.addCookie(mappingRequest.get(RequestKeys.COOKIE));
             }
 
-        } catch (IllegalArgumentException e) {
-            throw new IOException(e.getMessage());
+            return request;
+
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            return null;
         }
-
-        logger.debug(result.getURL());
-
-        return result;
     }
 
-    private HttpRequest parsePost(Map<String, String> request) throws IllegalArgumentException{
-        StringTokenizer bodyToken = new StringTokenizer(request.get(RequestKeys.BODY), "&");
+    private HttpRequest parseWithBody(Map<String, String> mappingRequest) throws IOException{
+        HTTPMethods methods = HTTPMethods.valueOf(mappingRequest.get(METHOD).toUpperCase());
+        String url = mappingRequest.get(URL);
+
+        HttpRequest request = new HttpRequest(methods, url);
+
+        //json 인경우
+        if (mappingRequest.get(CONTENT_TYPE).contains(ContentType.JSON.getType())) {
+            request.setContentType(ContentType.JSON);
+            parseJson(request, mappingRequest.get(BODY));
+        //url encoded인경우
+        }else {
+            request.setContentType(ContentType.URL_ENCODED);
+            parseUrlEncoded(request, mappingRequest.get(BODY));
+        }
+
+        return request;
+    }
+
+    private void parseJson(HttpRequest request, String bodyString) {
+        StringTokenizer bodyToken = new StringTokenizer(bodyString, ",{}");
 
         Map<String, String> body = new HashMap<>();
-        try {
-            //body에 User필드에 없는 값이 들어오는지 검사하기위해
-            List<String> requireFields = UserFiled.getFiledNames();
-            while (bodyToken.hasMoreTokens()) {
-                String[] tmp = bodyToken.nextToken().split("=");
-                if (!requireFields.contains(tmp[0])) throw new IllegalArgumentException(ILLEGAL_BODY_MESSAGE);
-                body.put(tmp[0], tmp[1]);
+        while (bodyToken.hasMoreTokens()) {
+            String nowToken = bodyToken.nextToken().replace("\"", "");
+            String[] tmp = nowToken.split(":");
+            try {
+                body.put(tmp[0].trim(), tmp[1].trim());
+            } catch (IndexOutOfBoundsException e) {
+                body.put(tmp[0].trim(), "NONE");
             }
-        }catch (IndexOutOfBoundsException e){
-            throw new IllegalArgumentException(ILLEGAL_BODY_MESSAGE);
         }
 
-        return new HttpRequest(HTTPMethods.POST, request.get(RequestKeys.URL), body, ContentType.URL_ENCODED);
+        request.setBody(body);
     }
 
-    private HttpRequest parseGet(Map<String, String> request) throws IllegalArgumentException{
-        HttpRequest result = new HttpRequest(HTTPMethods.GET, request.get(RequestKeys.URL), ContentType.HTML);
 
-        if (request.get(RequestKeys.URL).contains(FILE_SYMBOL)) {
+    private void parseUrlEncoded(HttpRequest request, String bodyString) {
+        StringTokenizer bodyToken = new StringTokenizer(bodyString, "&");
+
+        Map<String, String> body = new HashMap<>();
+        while (bodyToken.hasMoreTokens()) {
+            String[] tmp = bodyToken.nextToken().split("=");
+            body.put(tmp[0], tmp[1]);
+        }
+
+        request.setBody(body);
+    }
+
+    private HttpRequest parseHeaderOnly(Map<String, String> mappingRequest) {
+        HttpRequest result = new HttpRequest(HTTPMethods.GET, mappingRequest.get(RequestKeys.URL), ContentType.HTML);
+
+        if (mappingRequest.get(RequestKeys.URL).contains(FILE_SYMBOL)) {
             //content-type 파싱 :: 파일을 요청한경우
-            ContentType contentType = ContentType.valueOf(request.get(RequestKeys.URL).split("\\.")[1].toUpperCase());
-            result = new HttpRequest(HTTPMethods.GET, request.get(RequestKeys.URL), contentType);
+            ContentType contentType = ContentType.valueOf(mappingRequest.get(RequestKeys.URL).split("\\.")[1].toUpperCase());
+            result = new HttpRequest(HTTPMethods.GET, mappingRequest.get(RequestKeys.URL), contentType);
         }
         return result;
     }

@@ -141,3 +141,10 @@
   color: #ffffff;
   cursor: hover;
 }
+
+.error-message {
+  color: red; /* 빨간색으로 표시 */
+  font-size: 1rem; /* 폰트 크기 설정 */
+  margin-bottom: 24px; /* 메시지와 로그인 버튼 사이의 공간 */
+  text-align: center; /* 텍스트를 중앙 정렬 */
+}

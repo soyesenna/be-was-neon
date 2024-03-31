@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import processors.UserProcessor;
 import request.data.HttpRequest;
 import response.data.HttpResponse;
-import response.util.ResponseStatus;
+import response.util.HttpStatus;
 import utils.ContentType;
 import utils.HTTPMethods;
 import java.util.Map;
@@ -43,7 +43,7 @@ public class UserProcessorTest {
         HttpResponse response = new HttpResponse();
         userProcessor.register(request, response);
 
-        assertThat(response.getHeader()).contains(ResponseStatus.REDIRECT.getCode());
+        assertThat(response.getHeader()).contains(HttpStatus.REDIRECT.getCode());
         assertThat(response.hasBody()).isFalse();
 
         assertThat(Database.findUserById("kim")).isEqualTo(new User("kim", "1234", "김주영", "a@naver.com"));
@@ -67,7 +67,7 @@ public class UserProcessorTest {
 
         assertThat(response.hasCookie()).isTrue();
         assertThat(response.getHeader()).contains("Set-Cookie");
-        assertThat(response.getHeader()).contains(ResponseStatus.REDIRECT.getCode());
+        assertThat(response.getHeader()).contains(HttpStatus.REDIRECT.getCode());
 
         assertThat(Session.getSessionSize()).isEqualTo(1);
     }

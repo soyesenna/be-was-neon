@@ -26,7 +26,10 @@ public class ResponseSender {
         dos.writeBytes(response.getHeader());
         dos.writeBytes(CRLF);
         logger.debug("header response done");
-        if (response.getBody().length != 0) dos.write(response.getBody());
+        if (response.getBody().length != 0){
+            logger.debug(String.valueOf(response.getBody().length));
+            dos.write(response.getBody());
+        }
         dos.flush();
     }
 }

@@ -30,7 +30,7 @@ public class Repeater implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             HttpRequest request = new HttpRequest();
             //요청을 읽고 파싱
-            RequestReader reader = new RequestReader(new BufferedReader(new InputStreamReader(in)));
+            RequestReader reader = new RequestReader(new BufferedInputStream(in));
             request = reader.readHttpRequest();
             logger.info("Request Read And Parsing Done");
 

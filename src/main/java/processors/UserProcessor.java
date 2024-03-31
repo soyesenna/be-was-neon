@@ -10,10 +10,10 @@ import db.Database;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import property.annotations.Status;
+import property.annotations.ResponseStatus;
 import request.data.HttpRequest;
 import response.data.HttpResponse;
-import response.util.ResponseStatus;
+import response.util.HttpStatus;
 import utils.Paths;
 
 import java.util.*;
@@ -55,7 +55,9 @@ public class UserProcessor {
         User userById = Database.findUserById(body.get(USERID.getFiled()));
         //login fail
         if (userById == null || !userById.equalToPassword(body.get(PASSWORD.getFiled()))) {
-            String loginFailHTML = Paths.STATIC_RESOURCES + "/login/login_fail.html";
+            String loginFailHTML = TEMPLATE_PATH + "/login" + DEFAULT_FILE;
+
+            response.addAttribute("NO_LOGIN", "존재하지 않는 아이디 또는 비밀번호 입니다");
             response.setStatus200OK();
             response.setBody(loginFailHTML);
         //login success
@@ -82,7 +84,7 @@ public class UserProcessor {
     }
 
     @GetMapping("/list")
-    @Status(ResponseStatus.OK)
+    @ResponseStatus(HttpStatus.OK)
     public void getUserList(HttpRequest request, HttpResponse response) {
         User user = ProcessorUtil.getUserByCookieInSession(request);
 

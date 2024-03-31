@@ -3,7 +3,7 @@ package response.data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import response.util.dynamic.DynamicHtmlResolver;
-import response.util.ResponseStatus;
+import response.util.HttpStatus;
 import utils.ContentType;
 
 import java.io.BufferedReader;
@@ -14,35 +14,40 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static utils.StringUtils.CRLF;
-import static utils.StringUtils.appendCRLF;
 
 public class HttpResponse {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
-    private ResponseStatus status;
+    private HttpStatus status;
     private ResponseHeader header;
     private byte[] body;
     private Map<String, Object> dynamicAttributes;
 
     public HttpResponse() {
         //default status -> OK
-        this.status = ResponseStatus.OK;
+        this.status = HttpStatus.OK;
         this.header = new ResponseHeader();
         this.body = new byte[0];
         this.dynamicAttributes = new HashMap<>();
     }
 
     public void setStatus200OK() {
-        this.status = ResponseStatus.OK;
+        this.status = HttpStatus.OK;
     }
 
     public void setStatus404NotFound() {
-        this.status = ResponseStatus.NOT_FOUND;
+        this.status = HttpStatus.NOT_FOUND;
     }
 
     public void setStatus302Found(String redirectPath) {
-        this.status = ResponseStatus.REDIRECT;
+        this.status = HttpStatus.REDIRECT;
         header.setRedirectPath(redirectPath);
+    }
+
+    public void setJsonBody(String json) {
+        this.body = json.getBytes();
+        this.header.setContentLength(this.body.length);
+        this.header.setContentType(ContentType.JSON);
     }
 
     public void setBody(String path){

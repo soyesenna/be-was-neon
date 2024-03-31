@@ -59,7 +59,7 @@
     <a href="/templates/main"><img src="../img/signiture.svg" /></a>
     <ul class="header__menu">
       <li class="header__menu__item">
-        <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
+        <a class="btn btn_contained btn_size_s" href="/feed">글쓰기</a>
       </li>
       <li class="header__menu__item">
         <a class="btn btn_ghost btn_size_s" href="/user/logout">로그아웃</a>
@@ -68,27 +68,76 @@
   </header>
   <div class="page">
     <h2 class="page-title">게시글 작성</h2>
-    <form id="article-form" class="form" action="/article/write" method="post" enctype="multipart/form-data">
+    <!--[DYNAMIC]INSERT-ERROR: NAME=NO_CONTENTS-->
+    <!--[DYNAMIC]INSERT-ERROR: NAME=NO_FILE-->
+    <div id="article-form" class="form">
       <!-- 내용 입력 필드 -->
       <div class="textfield textfield_size_m">
         <p class="title_textfield">내용</p>
-        <textarea id="article-content" class="input_textfield" placeholder="글의 내용을 입력하세요" autocomplete="username"></textarea>
+        <input name="contents" id="article-content" class="input_textfield" placeholder="글의 내용을 입력하세요" />
       </div>
       <!-- 이미지 업로드 버튼과 미리보기 -->
       <div class="image-upload-container">
         <label for="image-upload" class="image-upload-btn">+</label>
         <span class="image-upload-text">이미지 업로드</span>
-        <input id="image-upload" type="file" accept="image/*" />
+        <input name="image" id="image-upload" type="file" accept="image/*" />
         <img id="image-preview" class="image-preview" src="#" alt="Image preview" />
       </div>
       <!-- 작성 완료 버튼 -->
-      <button id="registration-btn" class="btn btn_contained btn_size_m" style="margin-top: 24px" type="submit">
+      <button id="registration-btn" class="btn btn_contained btn_size_m" style="margin-top: 24px" onclick="submitArticle()">
         작성 완료
       </button>
-    </form>
+    </div>
   </div>
 </div>
 <script>
+  function submitArticle() {
+    var content = document.getElementById('article-content').value || '';
+    var fileInput = document.getElementById('image-upload');
+    var base64ImageContent = '';
+    var fileType = '';
+
+    if (fileInput.files && fileInput.files[0]) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        base64ImageContent = e.target.result.split(',')[1];
+        fileType = fileInput.files[0].type.split('/')[1];
+        sendRequest(content, base64ImageContent, fileType);
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    } else {
+      sendRequest(content, base64ImageContent, fileType);
+    }
+  }
+
+  function sendRequest(content, base64ImageContent, fileType) {
+    var jsonData = {
+      contents: content,
+      file: base64ImageContent || '',
+      file_type: fileType || ''
+    };
+
+    fetch('/feed/write', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(jsonData)
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json(); // 서버로부터 응답 받기
+      }
+      throw new Error('Network response was not ok.');
+    })
+    .then(data => {
+      // 서버가 리디렉트 URL을 응답 데이터로 보내주는 경우
+      window.location.href = data.redirectUrl; // 여기에서는 서버로부터 받은 리디렉트 URL을 사용
+    })
+    .catch(error => console.error('There was a problem with the fetch operation:', error));
+  }
+
+
   document.getElementById('image-upload').addEventListener('change', function() {
     if (this.files && this.files[0]) {
       var reader = new FileReader();

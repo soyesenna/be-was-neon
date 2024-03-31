@@ -2,16 +2,16 @@ package request;
 
 import request.data.HttpRequest;
 import request.util.RequestParser;
-import utils.HTTPMethods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.ContentType;
+import utils.StringUtils;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static request.util.constant.RequestKeys.*;
 import static request.util.constant.RequestKeys.BODY;
@@ -21,10 +21,10 @@ public class RequestReader {
 
     private final RequestParser parser = RequestParser.getInstance();
 
-    private final BufferedReader inputStream;
+    private final BufferedInputStream inputStream;
 
 
-    public RequestReader(BufferedReader inputStream) {
+    public RequestReader(BufferedInputStream inputStream) {
         this.inputStream = inputStream;
     }
 
@@ -39,45 +39,55 @@ public class RequestReader {
     private Map<String, String> readInputStream() throws IOException{
         Map<String, String> httpRequest = new HashMap<>();
 
-        //header start line
-        String[] startLine = inputStream.readLine().split(" ");
-        try {
-            httpRequest.put(METHOD, startLine[0]);
-            httpRequest.put(URL, startLine[1]);
-            httpRequest.put(HTTP_VERSION, startLine[2]);
-        }catch (IndexOutOfBoundsException e){
-            throw new IOException("잘못된 header입니다");
+        //request read
+        int bufSize = 1024;
+        byte[] buf;
+        int readSize = bufSize + 1;
+        ByteArrayOutputStream toHeader = new ByteArrayOutputStream();
+        ByteArrayOutputStream toBody = new ByteArrayOutputStream();
+        while (readSize >= bufSize) {
+            buf = new byte[bufSize];
+            readSize = inputStream.read(buf, 0, bufSize);
+            toHeader.write(buf);
+            toBody.write(buf);
+        }
+        String toHeaderString = toHeader.toString(StandardCharsets.UTF_8).trim();
+        toHeader.close();
+        if (toHeaderString.isEmpty()) throw new IOException();
+
+        logger.debug(toHeaderString);
+        //header와 body 분리
+        String[] tmp = toHeaderString.split(StringUtils.CRLF + StringUtils.CRLF);
+        //헤더 매핑
+        mappingHeader(httpRequest, tmp[0]);
+
+        //make body
+        if (httpRequest.containsKey(CONTENT_LENGTH)) {
+            httpRequest.put(BODY, tmp[1]);
         }
 
-        //header
-        String line;
-        while ((line = inputStream.readLine()) != null) {
-            if (line.isEmpty()) break;
-            String[] tmp = line.split(":");
-
-            String value = "";
-            for (int i = 1; i < tmp.length; i++) value += tmp[i];
-            value = value.trim();
-
-            httpRequest.put(tmp[0], value);
-        }
-
-        logger.debug(httpRequest.toString());
-
-        logger.debug("Request Header Read");
-        //body
-        if (httpRequest.get(CONTENT_LENGTH) != null) {
-            int bodyLength = Integer.parseInt(httpRequest.get(CONTENT_LENGTH));
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < bodyLength; i++) sb.append((char) inputStream.read());
-
-            httpRequest.put(BODY, sb.toString());
-
-            logger.debug("Request Body Read");
-        }
-        logger.debug(httpRequest.get(BODY));
+        toBody.close();
 
         return httpRequest;
+    }
+
+    private void mappingHeader(Map<String, String> result, String header) {
+        StringTokenizer headerToken = new StringTokenizer(header, StringUtils.CRLF);
+
+        //start line 매핑
+        StringTokenizer startLine = new StringTokenizer(headerToken.nextToken());
+        result.put(METHOD, startLine.nextToken());
+        result.put(URL, startLine.nextToken());
+        result.put(HTTP_VERSION, startLine.nextToken());
+
+        //나머지 header 매핑
+        StringTokenizer headerDetail;
+        while (headerToken.hasMoreTokens()) {
+            headerDetail = new StringTokenizer(headerToken.nextToken(), ":");
+            String key = headerDetail.nextToken().trim();
+            String value = headerDetail.nextToken().trim();
+            if (headerDetail.hasMoreTokens()) value += ":" + headerDetail.nextToken();
+            result.put(key, value);
+        }
     }
 }
