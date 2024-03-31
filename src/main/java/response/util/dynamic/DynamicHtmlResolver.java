@@ -18,9 +18,10 @@ public class DynamicHtmlResolver {
 
     private final BufferedReader fileReader;
     private final String DYNAMIC_IDENTITY = "[DYNAMIC]";
-    private final String ORDER_INSERT_LIST = "INSERT-LIST";
+    private final String ORDER_INSERT_LIST = "INSERT-USER-LIST";
     private final String ORDER_INSERT = "INSERT";
     private final String ORDER_INSERT_ERROR = "INSERT-ERROR";
+    private final String ORDER_INSERT_FEED_IMG = "INSERT-FEED-IMG";
     private final Map<String, Object> attributes;
 
     private Map<String, String > dataMapping = new HashMap<>();
@@ -64,16 +65,18 @@ public class DynamicHtmlResolver {
 
         try {
             //동적 생성 order 확인
-            //현재는 list와 string 두개로 구분됨
             if (order.contentEquals(ORDER_INSERT_LIST)) {
                 logger.debug("INSERT LIST PROCESS");
-                result = insertList();
+                result = insertUserList();
             } else if (order.contentEquals(ORDER_INSERT)) {
                 logger.debug("INSERT PROCESS");
                 result = insert();
             } else if (order.contentEquals(ORDER_INSERT_ERROR)) {
                 logger.debug("INSERT ERROR PROCESS");
                 result = insertError();
+            } else if (order.contentEquals(ORDER_INSERT_FEED_IMG)) {
+                logger.debug("INSERT FEED IMG PROCESS");
+                result = insertFeedImg();
             }
         } catch (NoSuchMethodException | InvocationTargetException |IllegalAccessException | UnsupportedEncodingException e) {
             logger.error(e.getMessage());
@@ -93,21 +96,32 @@ public class DynamicHtmlResolver {
         }
     }
 
+    private String insertFeedImg() {
+        Object roughData = attributes.get(dataMapping.get("NAME"));
+        if (roughData == null) return "";
+
+        String imgPath = (String) roughData;
+        StringBuilder html = new StringBuilder();
+
+        html.append("<img class=\"post__img\" src=\"").append(imgPath).append("\" />");
+
+        return html.toString();
+    }
+
     private String insertError() {
         Object roughAttribute = attributes.get(dataMapping.get("NAME"));
         if (roughAttribute == null) return "";
 
         StringBuilder html = new StringBuilder();
-        if (roughAttribute.getClass().getName().contains("String")) {
-            String errorMessage = (String) roughAttribute;
-            html.append("<p class=\"error-message\">").append(errorMessage).append("</p>");
-        }
+        String errorMessage = (String) roughAttribute;
+        html.append("<p class=\"error-message\">").append(errorMessage).append("</p>");
+
 
         return html.toString();
     }
 
 
-    private String insertList() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private String insertUserList() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Object roughAttribute = attributes.get(dataMapping.get("NAME"));
         if (roughAttribute == null) return "";
 
@@ -117,12 +131,10 @@ public class DynamicHtmlResolver {
 
         //동적으로 생성해야하는 타입과 주어진 타입이 일치하는지 검사
         if (roughAttribute instanceof List) {
-            List<Object> convetList = (List<Object>) roughAttribute;
-            if (convetList.get(0).getClass().getName().contains(dataMapping.get("TYPE"))) {
-                for (Object user : convetList) {
-                    users.add((User) user);
-                }
-            } else throw new IllegalArgumentException("설정된 타입과 실제 타입이 일치하지 않습니다");
+        List<Object> convetList = (List<Object>) roughAttribute;
+            for (Object rough : convetList) {
+                users.add((User) rough);
+            }
         } else throw new IllegalArgumentException("INSERT-LIST 명령은 List 타입만 가질 수 있습니다");
 
         //설정된 sequence에 따라 html에 추가
@@ -153,11 +165,8 @@ public class DynamicHtmlResolver {
         String insetString = "";
 
         //String attibutes 처리
-        if (roughData.getClass().getName().contains(dataMapping.get("TYPE"))) {
-            insetString = (String) roughData;
-            insetString = URLDecoder.decode(insetString, "UTF-8");
-        } else throw new IllegalArgumentException("설정된 타입과 실제 타입이 일치하지 않습니다");
-
+        insetString = (String) roughData;
+        insetString = URLDecoder.decode(insetString, "UTF-8");
 
         return insetString;
     }

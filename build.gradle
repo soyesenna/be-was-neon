@@ -15,8 +15,6 @@ dependencies {
 
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     testImplementation 'org.assertj:assertj-core:3.16.1'
-    // https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy
-    implementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.12'
 
 }
 

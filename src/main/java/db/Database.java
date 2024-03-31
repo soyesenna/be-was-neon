@@ -9,7 +9,7 @@ public class Database {
 
     private Database(){}
     private static Map<String, User> users = new HashMap<>();
-    private static Map<User, List<Feed>> usersFeed = new HashMap<>();
+    private static List<Feed> usersFeed = new ArrayList<>();
 
     public static void addUser(User user) {
         users.put(user.getUserId(), user);
@@ -23,10 +23,11 @@ public class Database {
         return users.values();
     }
 
-    public static void addFeed(User user, Feed feed) {
-        if (!usersFeed.containsKey(user)) {
-            usersFeed.put(user, new ArrayList<>());
-        }
-        usersFeed.get(user).add(feed);
+    public static void addFeed(Feed feed) {
+        usersFeed.add(feed);
+    }
+
+    public static List<Feed> getAllFeeds() {
+        return Collections.unmodifiableList(usersFeed);
     }
 }

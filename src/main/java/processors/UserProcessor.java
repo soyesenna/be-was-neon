@@ -45,7 +45,7 @@ public class UserProcessor {
                         body.get(EMAIL.getFiled()))
         );
 
-        response.setStatus302Found(DEFAULT_FILE);
+        response.setStatus302Found("/");
     }
 
     @PostMapping("/login")

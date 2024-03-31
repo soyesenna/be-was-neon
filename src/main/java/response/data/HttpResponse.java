@@ -6,10 +6,8 @@ import response.util.dynamic.DynamicHtmlResolver;
 import response.util.HttpStatus;
 import utils.ContentType;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,6 +63,20 @@ public class HttpResponse {
 
     private void setStaticBody(String path) throws IOException{
         logger.debug("Make Static Body");
+        if (path.contains(".html")) setHtml(path);
+        else setFile(path);
+    }
+
+    private void setFile(String path) throws IOException{
+        logger.debug("Make File Body");
+        FileInputStream fis = new FileInputStream(path);
+        byte[] allBytes = fis.readAllBytes();
+
+        this.body = allBytes;
+    }
+
+    private void setHtml(String path) throws IOException {
+        logger.debug("Make Html Body");
         StringBuilder sb = new StringBuilder();
 
         try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(path)))) {

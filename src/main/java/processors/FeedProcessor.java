@@ -66,7 +66,7 @@ public class FeedProcessor {
             String imageStoredpath = storeImage(writeUser, body.get("file"), body.get("file_type"));
 
             Feed feed = new Feed(writeUser.getName(), imageStoredpath, fileType, body.get("contents"));
-            Database.addFeed(writeUser, feed);
+            Database.addFeed(feed);
         }
         response.setStatus200OK();
         response.setJsonBody("{\"redirectUrl\":\"/\"}");
@@ -76,7 +76,7 @@ public class FeedProcessor {
         String hash = String.valueOf(user.hashCode());
         byte[] decodedImage = Base64.getDecoder().decode(image);
 
-        String dirPath = FEED_IMAGE_DIR + hash;
+        String dirPath = FEED_IMAGE_DIR + "/" + hash;
         File imageDir = new File(dirPath);
         int imageCount = 0;
         //이미 해당 유저의 이미지 디렉터리가 존재하면 이미지 개수 셈

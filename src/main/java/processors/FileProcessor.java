@@ -1,5 +1,7 @@
 package processors;
 
+import db.Database;
+import feed.Feed;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,9 @@ import request.data.HttpRequest;
 import response.data.HttpResponse;
 import response.util.HttpStatus;
 import utils.Paths;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static utils.Paths.*;
 
@@ -34,9 +39,8 @@ public class FileProcessor {
     @ResponseStatus(HttpStatus.OK)
     public void responseFile(HttpRequest request, HttpResponse response) {
         logger.debug("ResponseFile Call");
-        String path = Paths.STATIC_RESOURCES + request.getURL();
-
-        response.setBody(path);
+        if (request.getURL().contains("/feed_image")) response.setBody("." + request.getURL());
+        else response.setBody(STATIC_RESOURCES + request.getURL());
     }
 
     @GetMapping("/login")
@@ -53,21 +57,35 @@ public class FileProcessor {
     public void welcomePage(HttpRequest request, HttpResponse response) {
         logger.debug("WelcomePage Call");
 
-        User checkSession = ProcessorUtil.getUserByCookieInSession(request);
-        if (checkSession != null) {
+        User findUser = ProcessorUtil.getUserByCookieInSession(request);
+        if (findUser != null) {
             logger.debug("login welcome page");
 
-            response.addAttribute("USER_NAME", checkSession.getName());
+            response.addAttribute("USER_NAME", findUser.getName());
+
+            List<Feed> feeds = Database.getAllFeeds();
+
+            //아무 피드도 없을 경우
+            if (feeds.size() == 0) {
+                response.setBody(STATIC_RESOURCES + "/no_feed.html");
+                return;
+            }
+
+            //우선 첫번째 피드의 사진과 글을 보여준다
+            //나중에 쿼리 또는 body로 들어온 페이지의 피드를 보여주도록 수정
+            response.addAttribute("POST_USER_NAME", feeds.get(0).getUploaderName());
+//            String imagePath = String.valueOf(findUser.hashCode()) + ""
+            response.addAttribute("FEED_IMG", feeds.get(0).getImagePath());
             response.setBody(TEMPLATE_PATH + "/main" + DEFAULT_FILE);
 
         } else {
-            response.setBody(STATIC_RESOURCES + DEFAULT_FILE);
+            response.setBody(TEMPLATE_PATH + "/login" + DEFAULT_FILE);
             logger.debug("No login welcome page");
         }
     }
 
+
     @GetMapping("/registration")
-    @ResponseStatus(HttpStatus.OK)
     public void registerPage(HttpRequest request, HttpResponse response) {
         logger.debug("RegisterPage Call");
         String filePath = Paths.STATIC_RESOURCES + request.getURL() + DEFAULT_FILE;
