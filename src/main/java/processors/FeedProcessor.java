@@ -164,7 +164,7 @@ public class FeedProcessor {
             Map<String, String> body = request.getBody();
             String comment = body.get("comment");
 
-            nowFeed.addComment(new Comment(user.getUserId(), comment));
+            nowFeed.addComment(new Comment(user.getName(), comment));
 
             response.setStatus302Found("/");
         }

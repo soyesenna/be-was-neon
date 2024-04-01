@@ -52,7 +52,6 @@ public class FileProcessorTest {
 
         assertThat(response.getHeader()).contains(HttpStatus.OK.getCode());
         assertThat(response.getBody()).isNotEmpty();
-        assertThat(response.hasBody()).isTrue();
         assertThat(response.getBody()).isEqualTo(welcomePage);
     }
 
