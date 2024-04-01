@@ -42,6 +42,19 @@ public class RequestParser {
                 request.addCookie(mappingRequest.get(RequestKeys.COOKIE));
             }
 
+            //url 쿼리문이 있을경우
+            if (request.urlHasQuery()) {
+                String urlWithQuery = request.getURL();
+                StringTokenizer st = new StringTokenizer(urlWithQuery, "?");
+                String url = st.nextToken();
+                request.setUrl(url);
+                while (st.hasMoreTokens()) {
+                    String nowQuery = st.nextToken();
+                    String[] tmp = nowQuery.split("=");
+                    request.addQuery(tmp[0], tmp[1]);
+                }
+            }
+
             return request;
 
         } catch (IOException e) {

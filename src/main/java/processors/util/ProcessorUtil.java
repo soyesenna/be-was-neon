@@ -12,6 +12,8 @@ public class ProcessorUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessorUtil.class);
     public static final String COOKIE_SESSION_ID = "sid";
+    public static final String COOKIE_FEED_NUM = "feedId";
+    public static final int NO_FEED_COOKIE = -1;
 
     private ProcessorUtil() {
 
@@ -37,5 +39,20 @@ public class ProcessorUtil {
             logger.error("잘못된 쿠키 입니다");
             return null;
         }
+    }
+
+    public static int getFeedNumByCookieInSession(HttpRequest request) {
+        if (request.getCookie().isEmpty()) return NO_FEED_COOKIE;
+        if (!request.getCookie().containsKey(COOKIE_FEED_NUM)) return NO_FEED_COOKIE;
+
+        String feedId = request.getCookie().get(COOKIE_FEED_NUM);
+        int feedNum = NO_FEED_COOKIE;
+        try {
+            feedNum = Integer.parseInt(feedId);
+        } catch (NumberFormatException e) {
+            logger.error("잘못된 쿠키입니다");
+        }
+
+        return feedNum;
     }
 }

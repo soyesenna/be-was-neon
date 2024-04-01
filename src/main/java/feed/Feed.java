@@ -4,6 +4,7 @@ import model.User;
 import utils.ContentType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Feed {
@@ -33,6 +34,18 @@ public class Feed {
 
     public String getImagePath() {
         return this.imagePath;
+    }
+
+    public String getContents() {
+        return this.contents;
+    }
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+    }
+
+    public List<Comment> getComments() {
+        return Collections.unmodifiableList(this.comments);
     }
 
 

@@ -7,7 +7,6 @@ import response.util.HttpStatus;
 import utils.ContentType;
 
 import java.io.*;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,51 +41,36 @@ public class HttpResponse {
         header.setRedirectPath(redirectPath);
     }
 
-    public void setJsonBody(String json) {
+    public void setJsonBody(String key, String value) {
+        String json = "{\"%s\":\"%s\"}".formatted(key, value);
+
         this.body = json.getBytes();
         this.header.setContentLength(this.body.length);
         this.header.setContentType(ContentType.JSON);
     }
 
     public void setBody(String path){
+        this.header.setContentType(resolveContentType(path));
+
         try {
             //동적으로 응답해야하는지 확인
-            if (this.dynamicAttributes.isEmpty()) setStaticBody(path);
-            else setDynamicBody(path);
+            if (this.header.isHtml() && !this.dynamicAttributes.isEmpty()) {
+                setDynamicBody(path);
+            } else setStaticBody(path);
         } catch (IOException e) {
             logger.error("Body를 만드는 도중 에러가 발생했습니다 : {}", e.getMessage());
         }
 
-        this.header.setContentType(resolveContentType(path));
         this.header.setContentLength(this.body.length);
     }
 
     private void setStaticBody(String path) throws IOException{
         logger.debug("Make Static Body");
-        if (path.contains(".html")) setHtml(path);
-        else setFile(path);
-    }
+        try (FileInputStream fis = new FileInputStream(path)) {
+            byte[] allBytes = fis.readAllBytes();
 
-    private void setFile(String path) throws IOException{
-        logger.debug("Make File Body");
-        FileInputStream fis = new FileInputStream(path);
-        byte[] allBytes = fis.readAllBytes();
-
-        this.body = allBytes;
-    }
-
-    private void setHtml(String path) throws IOException {
-        logger.debug("Make Html Body");
-        StringBuilder sb = new StringBuilder();
-
-        try (BufferedReader fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(path)))) {
-            fileReader.lines()
-                    .forEach(string -> {
-                        sb.append(string).append(CRLF);
-                    });
+            this.body = allBytes;
         }
-
-        this.body = sb.toString().getBytes();
     }
 
     private void setDynamicBody(String path) throws IOException{
@@ -110,12 +94,20 @@ public class HttpResponse {
         this.dynamicAttributes.put(key.toUpperCase(), value);
     }
 
-    public void setCookie(String sid) {
-        this.header.setCookie(sid);
+    public void setSidCookie(String sid) {
+        this.header.setSidCookie(sid);
     }
 
-    public void deleteCookie(String sid) {
-        this.header.deleteCookie(sid);
+    public void setCookie(String cookieName, String value) {
+        this.header.setCookie(cookieName, value);
+    }
+
+    public void deleteSidCookie(String sid) {
+        this.header.deleteSidCookie(sid);
+    }
+
+    public void deleteCookie(String cookieName, String value) {
+        this.header.deleteCookie(cookieName, value);
     }
 
     public String getHeader() {

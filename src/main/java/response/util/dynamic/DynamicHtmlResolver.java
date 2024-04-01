@@ -1,27 +1,28 @@
 package response.util.dynamic;
 
+import feed.Comment;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static utils.StringUtils.*;
+import static response.util.dynamic.Orders.*;
 
 public class DynamicHtmlResolver {
     private static final Logger logger = LoggerFactory.getLogger(DynamicHtmlResolver.class);
+    private static final String NAME_FILED = "NAME";
 
     private final BufferedReader fileReader;
-    private final String DYNAMIC_IDENTITY = "[DYNAMIC]";
-    private final String ORDER_INSERT_LIST = "INSERT-USER-LIST";
-    private final String ORDER_INSERT = "INSERT";
-    private final String ORDER_INSERT_ERROR = "INSERT-ERROR";
-    private final String ORDER_INSERT_FEED_IMG = "INSERT-FEED-IMG";
+
     private final Map<String, Object> attributes;
 
     private Map<String, String > dataMapping = new HashMap<>();
@@ -77,8 +78,17 @@ public class DynamicHtmlResolver {
             } else if (order.contentEquals(ORDER_INSERT_FEED_IMG)) {
                 logger.debug("INSERT FEED IMG PROCESS");
                 result = insertFeedImg();
+            } else if (order.contentEquals(ORDER_REPLACE_HREF)) {
+                logger.debug("REPLACE HREF PROCESS");
+                result = replaceHref();
+            } else if (order.contentEquals(ORDER_INSERT_ARTICLE)) {
+                logger.debug("INSERT ARTICLE PROCESS");
+                result = insertArticle();
+            } else if (order.contentEquals(ORDER_INSERT_COMMENT)) {
+                logger.debug("INSERT COMMENT PROCESS");
+                result = insertComment();
             }
-        } catch (NoSuchMethodException | InvocationTargetException |IllegalAccessException | UnsupportedEncodingException e) {
+        } catch (NoSuchMethodException | InvocationTargetException |IllegalAccessException | IOException e) {
             logger.error(e.getMessage());
         }
 
@@ -96,8 +106,77 @@ public class DynamicHtmlResolver {
         }
     }
 
+    private String insertComment() {
+        Object roughData = attributes.get(dataMapping.get(NAME_FILED));
+        if (roughData == null) return "";
+
+        List<Comment> comments = new ArrayList<>();
+
+        //동적으로 생성해야하는 타입과 주어진 타입이 일치하는지 검사
+        if (roughData instanceof List) {
+            List<Object> convetList = (List<Object>) roughData;
+            for (Object rough : convetList) {
+                comments.add((Comment) rough);
+            }
+        } else throw new IllegalArgumentException("INSERT-COMMENT 명령은 List 타입만 가질 수 있습니다");
+
+        StringBuilder html = new StringBuilder();
+
+        for (Comment comment : comments) {
+            String userId = URLDecoder.decode(comment.getWriteUserId(), StandardCharsets.UTF_8);
+            String content = URLDecoder.decode(comment.getComment(), StandardCharsets.UTF_8);
+            html.append("<li class=\"comment__item\">")
+                    .append("<div class=\"comment__item__user\">")
+                    .append("<img class=\"comment__item__user__img\" />")
+                    .append("<p class=\"comment__item__user__nickname\">").append(userId).append("</p>")
+                    .append("</div>")
+                    .append("<p class=\"comment__item__article\">")
+                    .append(content).append("</p>").append("</li>");
+        }
+
+        return html.toString();
+    }
+
+    private String insertArticle() {
+        Object roughData = attributes.get(dataMapping.get(NAME_FILED));
+        if (roughData == null) return "";
+
+        String contents = (String) roughData;
+
+        StringBuilder html = new StringBuilder();
+        html.append("<p class=\"post__article\">");
+
+        contents = contents.replace("\\n", CRLF);
+        html.append(contents);
+        html.append("</p>").append("</div>");
+
+        return html.toString();
+    }
+
+    private String replaceHref() throws IOException {
+        Object roughData = attributes.get(dataMapping.get(NAME_FILED));
+        if (roughData == null) return "";
+        String hrefPath = (String) roughData;
+
+        String replaceLine = fileReader.readLine();
+        StringTokenizer st = new StringTokenizer(replaceLine, " ");
+
+        StringBuilder html = new StringBuilder();
+        while (st.hasMoreTokens()) {
+            String now = st.nextToken();
+            if (now.contains("href")) {
+                html.append("href=\"").append(hrefPath).append("\"");
+            } else html.append(now);
+            html.append(" ");
+        }
+
+        if (html.charAt(html.length() - 1) != '>') html.append(">");
+
+        return html.toString();
+    }
+
     private String insertFeedImg() {
-        Object roughData = attributes.get(dataMapping.get("NAME"));
+        Object roughData = attributes.get(dataMapping.get(NAME_FILED));
         if (roughData == null) return "";
 
         String imgPath = (String) roughData;
@@ -108,8 +187,13 @@ public class DynamicHtmlResolver {
         return html.toString();
     }
 
+    /**
+     * Error를 만들어주는 메서드
+     * 빨간색 글씨를 만들어준다
+     * @return
+     */
     private String insertError() {
-        Object roughAttribute = attributes.get(dataMapping.get("NAME"));
+        Object roughAttribute = attributes.get(dataMapping.get(NAME_FILED));
         if (roughAttribute == null) return "";
 
         StringBuilder html = new StringBuilder();
@@ -121,8 +205,15 @@ public class DynamicHtmlResolver {
     }
 
 
+    /**
+     * user list html을 만들어주는 메서드
+     * @return
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
     private String insertUserList() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Object roughAttribute = attributes.get(dataMapping.get("NAME"));
+        Object roughAttribute = attributes.get(dataMapping.get(NAME_FILED));
         if (roughAttribute == null) return "";
 
         StringBuilder html = new StringBuilder();
@@ -159,7 +250,7 @@ public class DynamicHtmlResolver {
     }
 
     private String insert() throws UnsupportedEncodingException {
-        Object roughData = attributes.get(dataMapping.get("NAME"));
+        Object roughData = attributes.get(dataMapping.get(NAME_FILED));
         if (roughData == null) return "";
 
         String insetString = "";

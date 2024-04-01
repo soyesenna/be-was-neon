@@ -13,11 +13,13 @@ public class HttpRequest {
     private ContentType contentType;
     private Map<String, String> body; //name=value
     private Map<String, String> cookie;
+    private Map<String, String> query;
 
     public HttpRequest(HTTPMethods methods, String url) {
         this.methods = methods;
         this.URL = url;
         this.cookie = new HashMap<>();
+        this.query = new HashMap<>();
     }
 
     public HttpRequest(HTTPMethods methods, String url, ContentType contentType) {
@@ -25,7 +27,8 @@ public class HttpRequest {
         this.URL = url;
         this.contentType = contentType;
         this.body = new HashMap<>();
-        this.cookie = new HashMap<>();;
+        this.cookie = new HashMap<>();
+        this.query = new HashMap<>();
     }
 
     public HttpRequest() {
@@ -34,6 +37,7 @@ public class HttpRequest {
         this.contentType = ContentType.NONE;
         this.body = new HashMap<>();
         this.cookie = new HashMap<>();
+        this.query = new HashMap<>();
     }
 
     public HTTPMethods getMethods() {
@@ -44,8 +48,8 @@ public class HttpRequest {
         return URL;
     }
 
-    public ContentType getContentType() {
-        return contentType;
+    public void setUrl(String url) {
+        this.URL = url;
     }
 
     public Map<String, String> getBody() {
@@ -71,6 +75,18 @@ public class HttpRequest {
 
     public Map<String, String> getCookie() {
         return this.cookie;
+    }
+
+    public void addQuery(String key, String value) {
+        this.query.put(key, value);
+    }
+
+    public boolean urlHasQuery() {
+        return this.URL.contains("?");
+    }
+
+    public String getQueryValue(String key) {
+        return this.query.get(key);
     }
 
     @Override

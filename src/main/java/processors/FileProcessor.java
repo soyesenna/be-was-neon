@@ -14,7 +14,6 @@ import response.data.HttpResponse;
 import response.util.HttpStatus;
 import utils.Paths;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static utils.Paths.*;
@@ -26,6 +25,8 @@ import static utils.Paths.*;
 public class FileProcessor {
     private static final Logger logger = LoggerFactory.getLogger(FileProcessor.class);
     private static final FileProcessor instance = new FileProcessor();
+    private static final String QUERY_KEY_PAGE = "page";
+
 
     private FileProcessor() {
 
@@ -53,8 +54,7 @@ public class FileProcessor {
     }
 
     @GetMapping("/")
-    @ResponseStatus(HttpStatus.OK)
-    public void welcomePage(HttpRequest request, HttpResponse response) {
+    public void mainPage(HttpRequest request, HttpResponse response) {
         logger.debug("WelcomePage Call");
 
         User findUser = ProcessorUtil.getUserByCookieInSession(request);
@@ -65,23 +65,66 @@ public class FileProcessor {
 
             List<Feed> feeds = Database.getAllFeeds();
 
-            //아무 피드도 없을 경우
-            if (feeds.size() == 0) {
-                response.setBody(STATIC_RESOURCES + "/no_feed.html");
+            //아무 피드도 없을 경우 no_feed.html 반환
+            if (feeds.isEmpty()) {
+                response.setBody(TEMPLATE_PATH + "/no_feed.html");
                 return;
             }
 
-            //우선 첫번째 피드의 사진과 글을 보여준다
-            //나중에 쿼리 또는 body로 들어온 페이지의 피드를 보여주도록 수정
-            response.addAttribute("POST_USER_NAME", feeds.get(0).getUploaderName());
-//            String imagePath = String.valueOf(findUser.hashCode()) + ""
-            response.addAttribute("FEED_IMG", feeds.get(0).getImagePath());
-            response.setBody(TEMPLATE_PATH + "/main" + DEFAULT_FILE);
+            int requestFeedNum = getNowFeed(request);
+            //요청한 피드를 보여준다
+            setFeed(response, feeds, requestFeedNum);
 
+            //동적으로 href들 설정
+            setDynamicHref(response, requestFeedNum);
+
+            response.setStatus200OK();
+            response.setBody(TEMPLATE_PATH + "/main" + DEFAULT_FILE);
         } else {
-            response.setBody(TEMPLATE_PATH + "/login" + DEFAULT_FILE);
+            response.setStatus302Found("/login");
             logger.debug("No login welcome page");
         }
+    }
+
+    private void setDynamicHref(HttpResponse response, int requestFeedNum) {
+        //다음 페이지 href 설정
+
+        addPageHref(response, "NEXT_PAGE", requestFeedNum + 1);
+        //이전 페이지 href 설정
+        //현재 페이지가 0일 경우는 변경하지 않음
+        if (requestFeedNum > 0) {
+            addPageHref(response, "PREV_PAGE", requestFeedNum - 1);
+        }
+        //댓글 작성 href 설정
+        //댓글은 피드에 속하므로 현재 피드 정보를 주어야함
+        String commentHref = "/feed/comment?feed=" + requestFeedNum;
+        response.addAttribute("COMMENT_BY_FEED", commentHref);
+    }
+
+    private int getNowFeed(HttpRequest request) {
+        int requestFeedNum = 0;
+        String pageQuery = request.getQueryValue(QUERY_KEY_PAGE);
+        if (pageQuery != null) {
+            try {
+                requestFeedNum = Integer.parseInt(pageQuery);
+            }catch (NumberFormatException e) {
+                //url 쿼리는 유저 마음대로 바꿔서 들어올 수 있으므로 예외처리함
+                requestFeedNum = 0;
+            }
+        }
+        return requestFeedNum;
+    }
+
+    private void setFeed(HttpResponse response, List<Feed> feeds, int requestFeedNum) {
+        response.addAttribute("POST_USER_NAME", feeds.get(requestFeedNum).getUploaderName());
+        response.addAttribute("FEED_IMG", feeds.get(requestFeedNum).getImagePath());
+        response.addAttribute("CONTENT", feeds.get(requestFeedNum).getContents());
+        response.addAttribute("COMMENT", feeds.get(requestFeedNum).getComments());
+    }
+
+    private void addPageHref(HttpResponse response, String name, int page) {
+        String prevPageQuery = "/?page=" + page;
+        response.addAttribute(name, prevPageQuery);
     }
 
 
@@ -106,5 +149,6 @@ public class FileProcessor {
             response.setBody(TEMPLATE_PATH + request.getURL() + DEFAULT_FILE);
         }
     }
+
 
 }

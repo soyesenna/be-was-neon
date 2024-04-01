@@ -48,7 +48,7 @@ public class FileProcessorTest {
         HttpRequest request = new HttpRequest(HTTPMethods.GET, "/", ContentType.HTML);
 
         HttpResponse response = new HttpResponse();
-        fileProcessor.welcomePage(request, response);
+        fileProcessor.mainPage(request, response);
 
         assertThat(response.getHeader()).contains(HttpStatus.OK.getCode());
         assertThat(response.getBody()).isNotEmpty();

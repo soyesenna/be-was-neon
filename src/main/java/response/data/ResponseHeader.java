@@ -33,12 +33,24 @@ public class ResponseHeader {
         this.contentLength = contentLength;
     }
 
-    public void setCookie(String id) {
+    public void setSidCookie(String id) {
         this.cookie = String.format(SET_COOKIE_FORMAT, id);
     }
 
-    public void deleteCookie(String id) {
+    public void setCookie(String cookieName, String value) {
+        this.cookie = String.format("%s=%s;path=/", cookieName, value);
+    }
+
+    public void deleteSidCookie(String id) {
         this.cookie = String.format(DELETE_COOKIE_FORMAT, id);
+    }
+
+    public void deleteCookie(String cookieId, String value) {
+        this.cookie = String.format("%s=%s;max-age=0", cookieId, value);
+    }
+
+    public boolean isHtml() {
+        return this.contentType.equals(ContentType.HTML);
     }
 
     @Override

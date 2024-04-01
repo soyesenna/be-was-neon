@@ -68,19 +68,17 @@
   </header>
   <div class="page">
     <h2 class="page-title">게시글 작성</h2>
-    <!--[DYNAMIC]INSERT-ERROR: NAME=NO_CONTENTS-->
-    <!--[DYNAMIC]INSERT-ERROR: NAME=NO_FILE-->
     <div id="article-form" class="form">
       <!-- 내용 입력 필드 -->
       <div class="textfield textfield_size_m">
         <p class="title_textfield">내용</p>
-        <input name="contents" id="article-content" class="input_textfield" placeholder="글의 내용을 입력하세요" />
+        <textarea name="contents" id="article-content" class="input_textfield" placeholder="글의 내용을 입력하세요" required></textarea>
       </div>
       <!-- 이미지 업로드 버튼과 미리보기 -->
       <div class="image-upload-container">
         <label for="image-upload" class="image-upload-btn">+</label>
         <span class="image-upload-text">이미지 업로드</span>
-        <input name="image" id="image-upload" type="file" accept="image/*" />
+        <input name="image" id="image-upload" type="file" accept="image/*" required/>
         <img id="image-preview" class="image-preview" src="#" alt="Image preview" />
       </div>
       <!-- 작성 완료 버튼 -->

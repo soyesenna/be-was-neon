@@ -68,7 +68,7 @@ public class UserProcessor {
             response.addAttribute("USER_NAME", userById.getName());
 
             response.setStatus302Found("/");
-            response.setCookie(userSessionId);
+            response.setSidCookie(userSessionId);
         }
     }
 
@@ -80,7 +80,7 @@ public class UserProcessor {
         Session.deleteSessionById(sessionId);
 
         response.setStatus302Found("/");
-        response.deleteCookie(sessionId);
+        response.deleteSidCookie(sessionId);
     }
 
     @GetMapping("/list")
