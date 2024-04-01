@@ -44,15 +44,6 @@ public class FileProcessor {
         else response.setBody(STATIC_RESOURCES + request.getURL());
     }
 
-    @GetMapping("/login")
-    @ResponseStatus(HttpStatus.OK)
-    public void loginPage(HttpRequest request, HttpResponse response) {
-        logger.debug("LoginPage Call");
-        String filePath = TEMPLATE_PATH + request.getURL() + DEFAULT_FILE;
-
-        response.setBody(filePath);
-    }
-
     @GetMapping("/")
     public void mainPage(HttpRequest request, HttpResponse response) {
         logger.debug("WelcomePage Call");
@@ -76,20 +67,22 @@ public class FileProcessor {
             setFeed(response, feeds, requestFeedNum);
 
             //동적으로 href들 설정
-            setDynamicHref(response, requestFeedNum);
+            setDynamicHref(response, requestFeedNum, feeds.size());
 
             response.setStatus200OK();
             response.setBody(TEMPLATE_PATH + "/main" + DEFAULT_FILE);
         } else {
-            response.setStatus302Found("/login");
+            response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
             logger.debug("No login welcome page");
         }
     }
 
-    private void setDynamicHref(HttpResponse response, int requestFeedNum) {
+    private void setDynamicHref(HttpResponse response, int requestFeedNum, int feedCount) {
         //다음 페이지 href 설정
-
-        addPageHref(response, "NEXT_PAGE", requestFeedNum + 1);
+        //현재 페이지가 마지막 페이지일경우 변경하지 않음
+        if (requestFeedNum < feedCount - 1) {
+            addPageHref(response, "NEXT_PAGE", requestFeedNum + 1);
+        }
         //이전 페이지 href 설정
         //현재 페이지가 0일 경우는 변경하지 않음
         if (requestFeedNum > 0) {
@@ -125,29 +118,6 @@ public class FileProcessor {
     private void addPageHref(HttpResponse response, String name, int page) {
         String prevPageQuery = "/?page=" + page;
         response.addAttribute(name, prevPageQuery);
-    }
-
-
-    @GetMapping("/registration")
-    public void registerPage(HttpRequest request, HttpResponse response) {
-        logger.debug("RegisterPage Call");
-        String filePath = Paths.STATIC_RESOURCES + request.getURL() + DEFAULT_FILE;
-
-        response.setBody(filePath);
-    }
-
-    @GetMapping("/feed")
-    @ResponseStatus(HttpStatus.OK)
-    public void articlePostPage(HttpRequest request, HttpResponse response) {
-        logger.debug("Postpage Call");
-        User user = ProcessorUtil.getUserByCookieInSession(request);
-
-        if (user == null) {
-            response.setBody(TEMPLATE_PATH + "/login" + DEFAULT_FILE);
-        } else {
-            response.addAttribute("USER_NAME", user.getName());
-            response.setBody(TEMPLATE_PATH + request.getURL() + DEFAULT_FILE);
-        }
     }
 
 

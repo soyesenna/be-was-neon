@@ -35,6 +35,23 @@ public class UserProcessor {
         return instance;
     }
 
+    @GetMapping("/registration")
+    public void registerPage(HttpRequest request, HttpResponse response) {
+        logger.debug("RegisterPage Call");
+        String filePath = Paths.STATIC_RESOURCES + request.getURL() + DEFAULT_FILE;
+
+        response.setBody(filePath);
+    }
+
+    @GetMapping("/login")
+    @ResponseStatus(HttpStatus.OK)
+    public void loginPage(HttpRequest request, HttpResponse response) {
+        logger.debug("LoginPage Call");
+        String filePath = TEMPLATE_PATH + request.getURL() + DEFAULT_FILE;
+
+        response.setBody(filePath);
+    }
+
     @PostMapping("/create")
     public void register(HttpRequest request, HttpResponse response) {
         Map<String, String> body = request.getBody();
@@ -55,7 +72,7 @@ public class UserProcessor {
         User userById = Database.findUserById(body.get(USERID.getFiled()));
         //login fail
         if (userById == null || !userById.equalToPassword(body.get(PASSWORD.getFiled()))) {
-            String loginFailHTML = TEMPLATE_PATH + "/login" + DEFAULT_FILE;
+            String loginFailHTML = TEMPLATE_PATH + ProcessorUtil.LOGIN_PAGE + DEFAULT_FILE;
 
             response.addAttribute("NO_LOGIN", "존재하지 않는 아이디 또는 비밀번호 입니다");
             response.setStatus200OK();
@@ -90,7 +107,7 @@ public class UserProcessor {
 
         //로그인 되어있지 않을때 로그인페이지로 이동
         if (user == null) {
-            response.setBody(Paths.STATIC_RESOURCES + Paths.LOGIN_DIR + Paths.DEFAULT_FILE);
+            response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
         }else {
             response.addAttribute("USER_LIST", Database.findAll().stream().toList());
             response.setBody(TEMPLATE_PATH + "/user_list.html");

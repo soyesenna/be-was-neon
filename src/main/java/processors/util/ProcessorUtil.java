@@ -13,6 +13,7 @@ public class ProcessorUtil {
     private static final Logger logger = LoggerFactory.getLogger(ProcessorUtil.class);
     public static final String COOKIE_SESSION_ID = "sid";
     public static final String COOKIE_FEED_NUM = "feedId";
+    public static final String LOGIN_PAGE = "/user/login";
     public static final int NO_FEED_COOKIE = -1;
 
     private ProcessorUtil() {

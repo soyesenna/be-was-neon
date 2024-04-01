@@ -42,13 +42,27 @@ public class FeedProcessor {
         return instance;
     }
 
+    @GetMapping("")
+    public void articlePostPage(HttpRequest request, HttpResponse response) {
+        logger.debug("Postpage Call");
+        User user = ProcessorUtil.getUserByCookieInSession(request);
+
+        if (user == null) {
+            response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
+        } else {
+            response.addAttribute("USER_NAME", user.getName());
+            response.setBody(TEMPLATE_PATH + request.getURL() + DEFAULT_FILE);
+        }
+    }
+
     @PostMapping("/write")
+    @ResponseStatus(HttpStatus.OK)
     public void feedWrite(HttpRequest request, HttpResponse response) {
         logger.debug("FeedWrite Call");
         User writeUser = ProcessorUtil.getUserByCookieInSession(request);
 
         if (writeUser == null) {
-            response.setStatus302Found(TEMPLATE_PATH + "/login" + DEFAULT_FILE);
+            response.setJsonBody("redirectUrl", ProcessorUtil.LOGIN_PAGE);
             return;
         } else {
             Map<String, String> body = request.getBody();
@@ -116,7 +130,7 @@ public class FeedProcessor {
         User user = ProcessorUtil.getUserByCookieInSession(request);
 
         if (user == null) {
-            response.setBody(TEMPLATE_PATH + "/login" + DEFAULT_FILE);
+            response.setBody(ProcessorUtil.LOGIN_PAGE);
         }else {
             int feedNum = -1;
             List<Feed> feeds = Database.getAllFeeds();
@@ -140,7 +154,7 @@ public class FeedProcessor {
         int feedNum = ProcessorUtil.getFeedNumByCookieInSession(request);
 
         if (user == null) {
-            response.setStatus302Found(TEMPLATE_PATH + "/login" + DEFAULT_FILE);
+            response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
             return;
         }
         if (feedNum == ProcessorUtil.NO_FEED_COOKIE) {
