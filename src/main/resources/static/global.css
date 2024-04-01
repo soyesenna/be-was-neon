@@ -79,6 +79,14 @@
   line-height: 14px;
 }
 
+.btn_disable {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 14px;
+  background: #aaaaaa;
+  color: #ffffff;
+}
+
 .form {
   display: flex;
   flex-direction: column;

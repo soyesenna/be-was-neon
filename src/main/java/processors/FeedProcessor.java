@@ -70,14 +70,12 @@ public class FeedProcessor {
             String contents = body.get("contents");
             if (contents.equals("NONE")) {
                 response.addAttribute("NO_CONTENTS", "내용을 입력해주세요!");
-                response.setStatus200OK();
                 response.setBody(TEMPLATE_PATH + "/feed" + DEFAULT_FILE);
                 return;
             }
             String fileData = body.get("file");
             if (fileData.equals("NONE")) {
                 response.addAttribute("NO_FILE", "파일을 업로드해주세요!");
-                response.setStatus200OK();
                 response.setBody(TEMPLATE_PATH + "/feed" + DEFAULT_FILE);
                 return;
             }
@@ -88,7 +86,6 @@ public class FeedProcessor {
             Feed feed = new Feed(writeUser.getName(), imageStoredpath, fileType, body.get("contents"));
             Database.addFeed(feed);
         }
-        response.setStatus200OK();
         response.setJsonBody("redirectUrl", "/");
 
     }

@@ -6,12 +6,71 @@
     <link href="../../reset.css" rel="stylesheet" />
     <link href="../../global.css" rel="stylesheet" />
 
-    <script>
-      function onRegister() {
-        alert("회원가입 완료");
-      }
-    </script>
   </head>
+  <script>
+    let idCheck = false;
+    let nameCheck = false;
+
+    function checkId() {
+      const userId = document.getElementById('userId').value;
+      const checkIdButton = document.getElementById('checkIdButton');
+      const submitButton = document.getElementById('registration-btn');
+
+      fetch('/user/checkId', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: userId }),
+      })
+              .then(response => response.json())
+              .then(data => {
+                if (data.check === "true") {
+                  alert("아이디 중복 확인 완료");
+                  checkIdButton.className = "btn btn_disable btn_size_s";
+                  checkIdButton.disabled = true;
+                  idCheck = true;
+                  if (idCheck && nameCheck) {
+                    submitButton.disabled = false;
+                    submitButton.className = "btn btn_contained btn_size_m";
+                  }
+                } else if(data.check === "false") {
+                  alert("중복되거나 잘못된 아이디입니다");
+                }
+              })
+              .catch(error => console.error('Error:', error));
+    }
+
+    function checkName() {
+      const userName = document.getElementById('name').value;
+      const checkNameButton = document.getElementById('checkNameButton');
+      const submitButton = document.getElementById('registration-btn');
+
+      fetch('/user/checkName', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userName: userName }),
+      })
+              .then(response => response.json())
+              .then(data => {
+                if (data.check === "true") {
+                  alert("닉네임 중복 확인 완료");
+                  checkNameButton.className = "btn btn_disable btn_size_s";
+                  checkNameButton.disabled = true;
+                  nameCheck = true;
+                  if (idCheck && nameCheck) {
+                    submitButton.disabled = false;
+                    submitButton.className = "btn btn_contained btn_size_m";
+                  }
+                } else if(data.check === "false") {
+                  alert("중복되거나 잘못된 닉네임입니다");
+                }
+              })
+              .catch(error => console.error('Error:', error));
+    }
+  </script>
   <body>
     <div class="container">
       <header class="header">
@@ -31,6 +90,40 @@
         <h2 class="page-title">회원가입</h2>
         <form class="form" id="registration-form" action="/user/create" method="post">
           <div class="textfield textfield_size_s">
+            <p class="title_textfield">아이디</p>
+            <input
+                    id="userId"
+                    name="userId"
+                    class="input_textfield"
+                    placeholder="아이디를 입력해주세요"
+                    autocomplete="username"
+                    required
+            />
+            <button
+                    id="checkIdButton"
+                    class="btn btn_contained btn_size_s"
+                    type="button"
+                    onclick="checkId()"
+            >중복 확인</button>
+          </div>
+          <div class="textfield textfield_size_s">
+            <p class="title_textfield">닉네임</p>
+            <input
+                    id="name"
+                    name="name"
+                    class="input_textfield"
+                    placeholder="닉네임을 입력해주세요"
+                    autocomplete="username"
+                    required
+            />
+            <button
+                    id="checkNameButton"
+                    class="btn btn_contained btn_size_s"
+                    type="button"
+                    onclick="checkName()"
+            >중복 확인</button>
+          </div>
+          <div class="textfield textfield_size_s">
             <p class="title_textfield">이메일</p>
             <input
                     type="email"
@@ -40,26 +133,6 @@
                     placeholder="이메일을 입력해주세요"
                     autocomplete="email"
                     required
-            />
-          </div>
-          <div class="textfield textfield_size_s">
-            <p class="title_textfield">아이디</p>
-            <input
-              name="userId"
-              class="input_textfield"
-              placeholder="아이디를 입력해주세요"
-              autocomplete="username"
-              required
-            />
-          </div>
-          <div class="textfield textfield_size_s">
-            <p class="title_textfield">닉네임</p>
-            <input
-              name="name"
-              class="input_textfield"
-              placeholder="닉네임을 입력해주세요"
-              autocomplete="username"
-              required
             />
           </div>
           <div class="textfield textfield_size_s">
@@ -74,10 +147,10 @@
             />
           </div>
           <button
-            onclick="onRegister()"
             id="registration-btn"
-            class="btn btn_contained btn_size_m"
+            class="btn btn_disable btn_size_m"
             style="margin-top: 24px"
+            disabled
             type="submit"
           >
             회원가입

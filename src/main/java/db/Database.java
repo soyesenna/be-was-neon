@@ -30,4 +30,18 @@ public class Database {
     public static List<Feed> getAllFeeds() {
         return Collections.unmodifiableList(usersFeed);
     }
+
+    public static boolean isIdExist(String id) {
+        for (User user : users.values()) {
+            if (user.getUserId().equalsIgnoreCase(id)) return true;
+        }
+        return false;
+    }
+
+    public static boolean isNameExist(String Name) {
+        for (User user : users.values()) {
+            if (user.getName().equalsIgnoreCase(Name)) return true;
+        }
+        return false;
+    }
 }

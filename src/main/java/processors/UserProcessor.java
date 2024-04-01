@@ -16,6 +16,7 @@ import response.data.HttpResponse;
 import response.util.HttpStatus;
 import utils.Paths;
 
+import java.io.ByteArrayOutputStream;
 import java.util.*;
 
 import static model.UserFiled.*;
@@ -100,6 +101,40 @@ public class UserProcessor {
         response.deleteSidCookie(sessionId);
     }
 
+    @PostMapping("/checkId")
+    public void checkIdIsDuplicate(HttpRequest request, HttpResponse response) {
+        Map<String, String> body = request.getBody();
+        String userId = body.get("userId");
+
+        if (userId == null) {
+            logger.error("JSON 요청이 잘못되었습니다");
+            return;
+        }
+
+        if (userId.equalsIgnoreCase("NONE") || Database.isIdExist(userId)) {
+            response.setJsonBody("check", "false");
+        } else {
+            response.setJsonBody("check", "true");
+        }
+    }
+
+    @PostMapping("/checkName")
+    public void checkNameIsDuplicate(HttpRequest request, HttpResponse response) {
+        Map<String, String> body = request.getBody();
+        String userName = body.get("userName");
+
+        if (userName == null) {
+            logger.error("JSON 요청이 잘못되었습니다");
+            return;
+        }
+
+        if (userName.equalsIgnoreCase("NONE") || Database.isNameExist(userName)) {
+            response.setJsonBody("check", "false");
+        } else {
+            response.setJsonBody("check", "true");
+        }
+    }
+
     @GetMapping("/list")
     @ResponseStatus(HttpStatus.OK)
     public void getUserList(HttpRequest request, HttpResponse response) {
@@ -108,7 +143,7 @@ public class UserProcessor {
         //로그인 되어있지 않을때 로그인페이지로 이동
         if (user == null) {
             response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
-        }else {
+        } else {
             response.addAttribute("USER_LIST", Database.findAll().stream().toList());
             response.setBody(TEMPLATE_PATH + "/user_list.html");
         }

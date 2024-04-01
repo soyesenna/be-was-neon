@@ -43,6 +43,7 @@ public class HttpResponse {
 
     public void setJsonBody(String key, String value) {
         String json = "{\"%s\":\"%s\"}".formatted(key, value);
+        logger.debug(json);
 
         this.body = json.getBytes();
         this.header.setContentLength(this.body.length);
