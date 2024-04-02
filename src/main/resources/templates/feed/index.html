@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="../reset.css" rel="stylesheet" />
   <link href="../global.css" rel="stylesheet" />
+  <link href="../main.css" rel="stylesheet" />
   <style>
     .image-upload-container {
       display: flex;
@@ -59,10 +60,20 @@
     <a href="/templates/main"><img src="../img/signiture.svg" /></a>
     <ul class="header__menu">
       <li class="header__menu__item">
+        <!--[DYNAMIC]REPLACE-IMG-SRC:NAME=USER_PROFILE-->
+        <img class="post__account__img" />
+      </li>
+      <li class="header__menu__item">
+        <!--[DYNAMIC]INSERT:NAME=USER_NAME-->
+      </li>
+      <li class="header__menu__item">
         <a class="btn btn_contained btn_size_s" href="/feed">글쓰기</a>
       </li>
       <li class="header__menu__item">
         <a class="btn btn_ghost btn_size_s" href="/user/logout">로그아웃</a>
+      </li>
+      <li class="header__menu__item">
+        <a class="btn btn_ghost btn_size_m" href="/user/setting">⚙️ 설정 ⚙️</a>
       </li>
     </ul>
   </header>

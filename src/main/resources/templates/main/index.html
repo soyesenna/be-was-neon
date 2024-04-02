@@ -13,6 +13,10 @@
         <a href="/templates/mainlates/main"><img src="./img/signiture.svg" /></a>
         <ul class="header__menu">
           <li class="header__menu__item">
+            <!--[DYNAMIC]REPLACE-IMG-SRC:NAME=USER_PROFILE-->
+            <img class="post__account__img" />
+          </li>
+          <li class="header__menu__item">
           <!--[DYNAMIC]INSERT:NAME=USER_NAME-->
           </li>
           <li class="header__menu__item">
@@ -21,11 +25,15 @@
           <li class="header__menu__item">
             <a class="btn btn_ghost btn_size_s" href="/user/logout">로그아웃</a>
           </li>
+          <li class="header__menu__item">
+            <a class="btn btn_ghost btn_size_m" href="/user/setting">⚙️ 설정 ⚙️</a>
+          </li>
         </ul>
       </header>
       <div class="wrapper">
         <div class="post">
           <div class="post__account">
+            <!--[DYNAMIC]REPLACE-IMG-SRC:NAME=USER_PROFILE-->
             <img class="post__account__img" />
             <p class="post__account__nickname">
               <!--[DYNAMIC]INSERT:NAME=POST_USER_NAME-->

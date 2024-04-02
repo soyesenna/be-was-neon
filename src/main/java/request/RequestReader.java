@@ -4,7 +4,6 @@ import request.data.HttpRequest;
 import request.util.RequestParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.ContentType;
 import utils.StringUtils;
 
 import java.io.BufferedInputStream;

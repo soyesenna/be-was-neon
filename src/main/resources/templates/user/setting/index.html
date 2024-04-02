@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../reset.css" rel="stylesheet" />ç
+    <link href="../global.css" rel="stylesheet" />
+    <link href="../main.css" rel="stylesheet" />
+    <style>
+        .profile-image-placeholder {
+            background-color: #E5E7EB;
+            border-radius: 9999px;
+            width: 384px; /* Three times bigger than the previous 128px */
+            height: 384px; /* Three times bigger than the previous 128px */
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+<div class="min-h-screen flex flex-col items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-semibold mb-4">프로필 설정</h1>
+        <div class="flex flex-col items-center mb-4">
+            <div class="profile-image-placeholder mb-2">
+                <!-- Placeholder for profile image -->
+                <img id="profileImage" src="" alt="Profile Image" class="hidden object-cover w-full h-full rounded-full">
+            </div>
+            <input type="file" id="imageUpload" class="hidden" accept="image/*" />
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onclick="document.getElementById('imageUpload').click()">
+                사진 업로드
+            </button>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="nickname">
+                새로운 닉네임을 입력하세요
+            </label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="nickname" type="text" placeholder="닉네임">
+        </div>
+        <div class="flex items-center justify-between mb-6">
+            <button id="checkButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center" onclick="checkNickname()">
+                중복 확인
+            </button>
+        </div>
+        <div class="flex items-center justify-center">
+            <button id="saveButton" class="btn btn_disable btn_size_m" disabled onclick="saveSetting()">
+                저장
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+    document.getElementById('imageUpload').addEventListener('change', function(event) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.getElementById('profileImage');
+            img.src = e.target.result;
+            img.classList.remove('hidden');
+        };
+        reader.readAsDataURL(event.target.files[0]);
+    });
+
+    function saveSetting() {
+        var name = document.getElementById('nickname').value || '';
+        var fileInput = document.getElementById('imageUpload');
+        var base64ImageContent = '';
+        var fileType = '';
+
+        if (fileInput.files && fileInput.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                base64ImageContent = e.target.result.split(',')[1];
+                fileType = fileInput.files[0].type.split('/')[1];
+                sendRequest(name, base64ImageContent, fileType);
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            sendRequest(name, base64ImageContent, fileType);
+        }
+    }
+
+    function sendRequest(name, base64ImageContent, fileType) {
+        var jsonData = {
+            name: name,
+            file: base64ImageContent || '',
+            file_type: fileType || ''
+        };
+
+        fetch('/user/setting', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(jsonData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json(); // 서버로부터 응답 받기
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .then(data => {
+                // 서버가 리디렉트 URL을 응답 데이터로 보내주는 경우
+                window.location.href = data.redirectUrl; // 여기에서는 서버로부터 받은 리디렉트 URL을 사용
+            })
+            .catch(error => console.error('There was a problem with the fetch operation:', error));
+    }
+
+
+    function checkNickname() {
+        const userName = document.getElementById('nickname').value;
+        const checkNameButton = document.getElementById('checkButton');
+        const submitButton = document.getElementById('saveButton');
+
+
+        fetch('/user/checkName', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userName: userName }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.check === "true") {
+                    alert("닉네임 중복 확인 완료");
+                    checkNameButton.className = "btn btn_disable btn_size_s";
+                    checkNameButton.disabled = true;
+                    submitButton.disabled = false;
+                    submitButton.className = "btn btn_contained btn_size_m";
+
+                } else if(data.check === "false") {
+                    alert("중복되거나 잘못된 닉네임입니다");
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+
+
+    // function saveProfile() {
+    //     const nickname = document.getElementById('nickname').value;
+    //     const image = document.getElementById('profileImage').src;
+    //     const fileType = image.substring("data:image/".length, image.indexOf(";base64"));
+    //
+    //     const data = {
+    //         name: nickname,
+    //         file: image.replace(/^data:image\/(png|jpg|jpeg);base64,/, ""),
+    //         file_type: fileType
+    //     };
+    //
+    //     // Simulate sending data to the server
+    //     console.log('Data sent to the server:', data);
+    //
+    //     alert('Profile saved successfully.');
+    // }
+</script>
+</body>
+</html>

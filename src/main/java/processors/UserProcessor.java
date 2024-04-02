@@ -83,7 +83,7 @@ public class UserProcessor {
             String userSessionId = UUID.randomUUID().toString();
             //session에 추가
             Session.addSession(userSessionId, userById);
-            response.addAttribute("USER_NAME", userById.getName());
+            response.addAttribute("USER_NAME", String.format(ProcessorUtil.WELCOME_USER_NAME, userById.getName()));
 
             response.setStatus302Found("/");
             response.setSidCookie(userSessionId);
@@ -132,6 +132,43 @@ public class UserProcessor {
             response.setJsonBody("check", "false");
         } else {
             response.setJsonBody("check", "true");
+        }
+    }
+
+    @GetMapping("/setting")
+    public void profileSettingPage(HttpRequest request, HttpResponse response) {
+        User user = ProcessorUtil.getUserByCookieInSession(request);
+
+        //로그인 되어있지 않을때 로그인페이지로 이동
+        if (user == null) {
+            response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
+        }else {
+            response.setStatus200OK();
+            response.addAttribute("USER_NAME", String.format(ProcessorUtil.WELCOME_USER_NAME, user.getName()));
+            response.setBody(TEMPLATE_PATH + request.getURL() + DEFAULT_FILE);
+        }
+    }
+
+    @PostMapping("/setting")
+    public void changeProfile(HttpRequest request, HttpResponse response) {
+        User user = ProcessorUtil.getUserByCookieInSession(request);
+
+        //로그인 되어있지 않을때 로그인페이지로 이동
+        if (user == null) {
+            response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
+        }else {
+            Map<String, String> body = request.getBody();
+            String newName = body.get("name");
+            String newProfileImg = body.get("file");
+
+            String fileType = body.get("file_type");
+            String imgSavePath = ProcessorUtil.storeImage(user, newProfileImg, fileType, PROFILE_IMAGE_DIR, false);
+
+            user.setProfileImage(imgSavePath);
+            user.setName(newName);
+
+            response.setStatus200OK();
+            response.setJsonBody("redirectUrl", "/");
         }
     }
 

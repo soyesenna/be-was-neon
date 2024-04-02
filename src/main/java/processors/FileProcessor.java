@@ -40,7 +40,7 @@ public class FileProcessor {
     @ResponseStatus(HttpStatus.OK)
     public void responseFile(HttpRequest request, HttpResponse response) {
         logger.debug("ResponseFile Call");
-        if (request.getURL().contains("/feed_image")) response.setBody("." + request.getURL());
+        if (request.getURL().contains("/feed_image") || request.getURL().contains("/user_profile_img")) response.setBody("." + request.getURL());
         else response.setBody(STATIC_RESOURCES + request.getURL());
     }
 
@@ -52,7 +52,10 @@ public class FileProcessor {
         if (findUser != null) {
             logger.debug("login welcome page");
 
-            response.addAttribute("USER_NAME", findUser.getName());
+            response.addAttribute("USER_NAME", String.format(ProcessorUtil.WELCOME_USER_NAME, findUser.getName()));
+            if (findUser.hasProfileImage()) {
+                response.addAttribute("USER_PROFILE", findUser.getProfileImgPath());
+            }
 
             List<Feed> feeds = Database.getAllFeeds();
 
@@ -64,7 +67,7 @@ public class FileProcessor {
 
             int requestFeedNum = getNowFeed(request);
             //요청한 피드를 보여준다
-            setFeed(response, feeds, requestFeedNum);
+            setFeed(response, feeds.get(requestFeedNum));
 
             //동적으로 href들 설정
             setDynamicHref(response, requestFeedNum, feeds.size());
@@ -108,11 +111,11 @@ public class FileProcessor {
         return requestFeedNum;
     }
 
-    private void setFeed(HttpResponse response, List<Feed> feeds, int requestFeedNum) {
-        response.addAttribute("POST_USER_NAME", feeds.get(requestFeedNum).getUploaderName());
-        response.addAttribute("FEED_IMG", feeds.get(requestFeedNum).getImagePath());
-        response.addAttribute("CONTENT", feeds.get(requestFeedNum).getContents());
-        response.addAttribute("COMMENT", feeds.get(requestFeedNum).getComments());
+    private void setFeed(HttpResponse response, Feed feed) {
+        response.addAttribute("POST_USER_NAME", feed.getUploaderName());
+        response.addAttribute("FEED_IMG", feed.getImagePath());
+        response.addAttribute("CONTENT", feed.getContents());
+        response.addAttribute("COMMENT", feed.getComments());
     }
 
     private void addPageHref(HttpResponse response, String name, int page) {

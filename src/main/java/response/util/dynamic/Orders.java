@@ -10,7 +10,7 @@ public class Orders {
     public static final String ORDER_REPLACE_HREF = "REPLACE-HREF";
     public static final String ORDER_INSERT_ARTICLE = "INSERT-ARTICLE";
     public static final String ORDER_INSERT_COMMENT = "INSERT-COMMENT";
-
+    public static final String ORDER_REPLACE_IMG_SRC = "REPLACE-IMG-SRC";
     private Orders() {
 
     }

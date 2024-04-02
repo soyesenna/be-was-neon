@@ -7,6 +7,7 @@ public class User {
     private String password;
     private String name;
     private String email;
+    private String profileImgPath = "";
 
     public User(String userId, String password, String name, String email) {
         this.userId = userId;
@@ -35,6 +36,22 @@ public class User {
         return password.contentEquals(this.password);
     }
 
+    public void setProfileImage(String profileImgPath) {
+        this.profileImgPath = profileImgPath;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean hasProfileImage() {
+        return !this.profileImgPath.isEmpty();
+    }
+
+    public String getProfileImgPath() {
+        return this.profileImgPath;
+    }
+
     @Override
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
@@ -51,6 +68,6 @@ public class User {
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, password, name, email);
+        return Objects.hash(userId, password, email);
     }
 }

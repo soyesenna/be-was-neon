@@ -9,27 +9,27 @@ import java.util.List;
 
 public class Feed {
 
-    private String uploaderName;
+    private User uploader;
     private String contents;
     private String imagePath;
     private ContentType imageType;
     private List<Comment> comments = new ArrayList<>();
 
-    public Feed(String uploader, String imagePath, ContentType imageType) {
-        this.uploaderName = uploader;
+    public Feed(User uploader, String imagePath, ContentType imageType) {
+        this.uploader = uploader;
         this.imagePath = imagePath;
         this.contents = "";
         this.imageType = imageType;
     }
-    public Feed(String uploader, String imagePath, ContentType imageType,  String contents) {
-        this.uploaderName = uploader;
+    public Feed(User uploader, String imagePath, ContentType imageType,  String contents) {
+        this.uploader = uploader;
         this.contents = contents;
         this.imagePath = imagePath;
         this.imageType = imageType;
     }
 
     public String getUploaderName() {
-        return this.uploaderName;
+        return this.uploader.getName();
     }
 
     public String getImagePath() {

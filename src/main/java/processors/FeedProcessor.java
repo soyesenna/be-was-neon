@@ -16,10 +16,6 @@ import response.data.HttpResponse;
 import response.util.HttpStatus;
 import utils.ContentType;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -50,7 +46,10 @@ public class FeedProcessor {
         if (user == null) {
             response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
         } else {
-            response.addAttribute("USER_NAME", user.getName());
+            if (user.hasProfileImage()) {
+                response.addAttribute("USER_PROFILE", user.getProfileImgPath());
+            }
+            response.addAttribute("USER_NAME", String.format(ProcessorUtil.WELCOME_USER_NAME, user.getName()));
             response.setBody(TEMPLATE_PATH + request.getURL() + DEFAULT_FILE);
         }
     }
@@ -66,59 +65,28 @@ public class FeedProcessor {
             return;
         } else {
             Map<String, String> body = request.getBody();
-            logger.debug(body.toString());
             String contents = body.get("contents");
             if (contents.equals("NONE")) {
-                response.addAttribute("NO_CONTENTS", "내용을 입력해주세요!");
                 response.setBody(TEMPLATE_PATH + "/feed" + DEFAULT_FILE);
                 return;
             }
             String fileData = body.get("file");
             if (fileData.equals("NONE")) {
-                response.addAttribute("NO_FILE", "파일을 업로드해주세요!");
                 response.setBody(TEMPLATE_PATH + "/feed" + DEFAULT_FILE);
                 return;
             }
             ContentType fileType = ContentType.valueOf(body.get("file_type").toUpperCase());
 
-            String imageStoredpath = storeImage(writeUser, body.get("file"), body.get("file_type"));
+            String imageStoredpath = ProcessorUtil.storeImage(writeUser, fileData, body.get("file_type"), FEED_IMAGE_DIR, true);
 
-            Feed feed = new Feed(writeUser.getName(), imageStoredpath, fileType, body.get("contents"));
+            Feed feed = new Feed(writeUser, imageStoredpath, fileType, body.get("contents"));
             Database.addFeed(feed);
         }
         response.setJsonBody("redirectUrl", "/");
 
     }
 
-    private String storeImage(User user, String image, String imageType) {
-        String hash = String.valueOf(user.hashCode());
-        byte[] decodedImage = Base64.getDecoder().decode(image);
 
-        String dirPath = FEED_IMAGE_DIR + "/" + hash;
-        File imageDir = new File(dirPath);
-        int imageCount = 0;
-        //이미 해당 유저의 이미지 디렉터리가 존재하면 이미지 개수 셈
-        if (imageDir.exists() && imageDir.isDirectory()) {
-            String[] files = imageDir.list();
-            for (String fileName : files) {
-                File file = new File(imageDir + File.separator + fileName);
-                if (file.isFile()) {
-                    imageCount++;
-                }
-            }
-        } else {
-            imageDir.mkdirs();
-        }
-
-        String imageStoredPath = dirPath + "/" + imageCount + "." + imageType;
-        try (FileOutputStream fileOutputStream = new FileOutputStream(imageStoredPath)) {
-            fileOutputStream.write(decodedImage);
-        } catch (IOException e) {
-            logger.error("이미지를 저장하는데 실패했습니다");
-        }
-
-        return imageStoredPath;
-    }
 
     @GetMapping("/comment")
     @ResponseStatus(HttpStatus.OK)
@@ -139,6 +107,7 @@ public class FeedProcessor {
                 logger.error("잘못된 쿼리 형식입니다");
                 return;
             }
+            response.addAttribute("USER_NAME", String.format(ProcessorUtil.WELCOME_USER_NAME, user.getName()));
             //feedId라는 쿠키를 저장하여 피드를 구분함
             response.setCookie("feedId", String.valueOf(feedNum));
             response.setBody(STATIC_RESOURCES + "/comment" + DEFAULT_FILE);
@@ -164,7 +133,7 @@ public class FeedProcessor {
             Map<String, String> body = request.getBody();
             String comment = body.get("comment");
 
-            nowFeed.addComment(new Comment(user.getName(), comment));
+            nowFeed.addComment(new Comment(user, comment));
 
             response.setStatus302Found("/");
         }

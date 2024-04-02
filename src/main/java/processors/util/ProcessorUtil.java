@@ -8,12 +8,18 @@ import org.slf4j.LoggerFactory;
 import processors.FileProcessor;
 import request.data.HttpRequest;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Base64;
+
 public class ProcessorUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessorUtil.class);
     public static final String COOKIE_SESSION_ID = "sid";
     public static final String COOKIE_FEED_NUM = "feedId";
     public static final String LOGIN_PAGE = "/user/login";
+    public static final String WELCOME_USER_NAME = "환영합니다❗  %s  님";
     public static final int NO_FEED_COOKIE = -1;
 
     private ProcessorUtil() {
@@ -55,5 +61,43 @@ public class ProcessorUtil {
         }
 
         return feedNum;
+    }
+
+    public static String storeImage(User user, String image, String imageType, String dir, boolean duplicateSave) {
+        String hash = String.valueOf(user.hashCode());
+        byte[] decodedImage = Base64.getDecoder().decode(image);
+
+        String imageStoredPath = "";
+        //이미지를 여러장 저장하는 경우
+        if (duplicateSave) {
+            String dirPath = dir + "/" + hash;
+            File imageDir = new File(dirPath);
+            int imageCount = 0;
+            //이미 해당 유저의 이미지 디렉터리가 존재하면 이미지 개수 셈
+            if (imageDir.exists() && imageDir.isDirectory()) {
+                String[] files = imageDir.list();
+                for (String fileName : files) {
+                    File file = new File(imageDir + File.separator + fileName);
+                    if (file.isFile()) {
+                        imageCount++;
+                    }
+                }
+            } else {
+                imageDir.mkdirs();
+            }
+
+            imageStoredPath = dirPath + "/" + imageCount + "." + imageType;
+        } else {
+            //이미지를 한장만 저장하는 경우
+            //프로필 이미지는 유저당 무조건 한장이다
+            imageStoredPath = dir + "/" + hash + "." + imageType;
+        }
+        try (FileOutputStream fileOutputStream = new FileOutputStream(imageStoredPath)) {
+            fileOutputStream.write(decodedImage);
+        } catch (IOException e) {
+            logger.error("이미지를 저장하는데 실패했습니다");
+        }
+
+        return imageStoredPath;
     }
 }

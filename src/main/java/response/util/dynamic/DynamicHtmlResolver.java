@@ -87,6 +87,9 @@ public class DynamicHtmlResolver {
             } else if (order.contentEquals(ORDER_INSERT_COMMENT)) {
                 logger.debug("INSERT COMMENT PROCESS");
                 result = insertComment();
+            } else if (order.contentEquals(ORDER_REPLACE_IMG_SRC)) {
+                logger.debug("REPLACE IMG SRC PROCESS");
+                result = replaceImgSrc();
             }
         } catch (NoSuchMethodException | InvocationTargetException |IllegalAccessException | IOException e) {
             logger.error(e.getMessage());
@@ -106,6 +109,21 @@ public class DynamicHtmlResolver {
         }
     }
 
+    private String replaceImgSrc() throws IOException {
+        Object roughData = attributes.get(dataMapping.get(NAME_FILED));
+        if (roughData == null) return "";
+
+        String replaceLine = fileReader.readLine();
+
+        String src = (String) roughData;
+        StringBuilder html = new StringBuilder();
+
+        html.append("<img class=\"post__account__img\" src=\"")
+                .append(src)
+                .append("\" />");
+        return html.toString();
+    }
+
     private String insertComment() {
         Object roughData = attributes.get(dataMapping.get(NAME_FILED));
         if (roughData == null) return "";
@@ -123,19 +141,25 @@ public class DynamicHtmlResolver {
         StringBuilder html = new StringBuilder();
 
         for (Comment comment : comments) {
-            String userId = URLDecoder.decode(comment.getWriteUserId(), StandardCharsets.UTF_8);
+            String userId = URLDecoder.decode(comment.getWriteUserName(), StandardCharsets.UTF_8);
             String content = URLDecoder.decode(comment.getComment(), StandardCharsets.UTF_8);
             html.append("<li class=\"comment__item\">")
-                    .append("<div class=\"comment__item__user\">")
-                    .append("<img class=\"comment__item__user__img\" />")
-                    .append("<p class=\"comment__item__user__nickname\">").append(userId).append("</p>")
-                    .append("</div>")
-                    .append("<p class=\"comment__item__article\">")
-                    .append(content).append("</p>").append("</li>");
-        }
-
+                    .append("<div class=\"comment__item__user\">");
+            if (comment.writeUserHasProfile()) {
+                html.append("<img class=\"comment__item__user__img\" src=\"")
+                        .append(comment.writeUserProfileImg())
+                        .append("\" />");
+            }else html.append("<img class=\"comment__item__user__img\" />");
+            html.append("<p class=\"comment__item__user__nickname\">").append(userId).append("</p>")
+            .append("</div>")
+            .append("<p class=\"comment__item__article\">")
+            .append(content).append("</p>").append("</li>");
+            }
         return html.toString();
     }
+
+
+
 
     private String insertArticle() {
         Object roughData = attributes.get(dataMapping.get(NAME_FILED));
