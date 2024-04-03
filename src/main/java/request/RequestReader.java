@@ -60,6 +60,8 @@ public class RequestReader {
         //헤더 매핑
         mappingHeader(httpRequest, tmp[0]);
 
+        logger.debug(httpRequest.get(URL));
+
         //make body
         if (httpRequest.containsKey(CONTENT_LENGTH)) {
             httpRequest.put(BODY, tmp[1]);

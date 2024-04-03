@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="../reset.css" rel="stylesheet">
-    <link href="../global.css" rel="stylesheet">
-    <link href="../main.css" rel="stylesheet">
+    <link href="/reset.css" rel="stylesheet">
+    <link href="/global.css" rel="stylesheet">
+    <link href="/main.css" rel="stylesheet">
     <title>콘텐츠 없음</title>
     <style>
         .empty-content {
@@ -47,7 +47,7 @@
 <body>
 <div class="container">
     <header class="header">
-        <a href="/"><img src="../img/signiture.svg" alt="로고 이미지"></a>
+        <a href="/"><img src="/img/signiture.svg" alt="로고 이미지"></a>
         <ul class="header__menu">
             <li class="header__menu__item">
                 <!--[DYNAMIC]REPLACE-IMG-SRC:NAME=USER_PROFILE-->
@@ -57,18 +57,15 @@
                 <!--[DYNAMIC]INSERT:NAME=USER_NAME-->
             </li>
             <li class="header__menu__item">
-                <a class="btn btn_contained btn_size_s" href="/user/logout">로그아웃</a>
+                <a class="btn btn_contained btn_size_s" href="/user/registration">회원 가입</a>
             </li>
             <li class="header__menu__item">
-                <a class="btn btn_ghost btn_size_s" href="/user/registration">회원 가입</a>
-            </li>
-            <li class="header__menu__item">
-                <a class="btn btn_ghost btn_size_m" href="/user/setting">⚙️ 설정 ⚙️</a>
+                <a class="btn btn_ghost btn_size_s" href="/user/logout">로그아웃</a>
             </li>
         </ul>
     </header>
     <main class="empty-content">
-        <img src="../img/no-feed.png" alt="텅 빈 박스 이미지" class="empty-content__image">
+        <img src="/img/no-feed.png" alt="텅 빈 박스 이미지" class="empty-content__image">
         <h2 class="empty-content__title">아직 피드가 없어요!</h2>
         <p class="empty-content__text">첫 게시물을 만들어 세상과 소통해보세요.</p>
         <a href="/feed" class="empty-content__link">게시물 작성하기</a>

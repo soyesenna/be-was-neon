@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/reset.css" rel="stylesheet" />ç
+    <link href="/global.css" rel="stylesheet" />
+    <link href="/main.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .profile {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .profile img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .profile .username {
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(300px, 1fr));
+            gap: 10px;
+            padding: 50px;
+            justify-items: center;
+        }
+        .gallery .img-wrapper {
+            width: 300px;
+            height: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 5px solid black; /* 검은색 테두리 추가 */
+            padding: 5px; /* 테두리와 이미지 사이의 공간 생성 */
+            box-sizing: border-box; /* 패딩과 테두리 포함한 총 크기를 300px로 유지 */
+        }
+        .gallery img {
+            width: 100%; /* 컨테이너에 맞춰 이미지 크기 조정 */
+            height: auto;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="header">
+        <a href="/"><img src="/img/signiture.svg" /></a>
+        <ul class="header__menu">
+            <li class="header__menu__item">
+                <!--[DYNAMIC]REPLACE-IMG-SRC:NAME=NOW_USER_PROFILE-->
+                <img class="post__account__img" />
+            </li>
+            <li class="header__menu__item">
+                <!--[DYNAMIC]INSERT:NAME=NOW_USER_NAME-->
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn_contained btn_size_s" href="/feed">피드 만들기</a>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn_ghost btn_size_s" href="/user/logout">로그아웃</a>
+            </li>
+            <li class="header__menu__item">
+                <!--[DYNAMIC]INSERT-SETTING:NAME=SETTING-->
+            </li>
+        </ul>
+    </header>
+    <div class="profile">
+        <!--[DYNAMIC]REPLACE-IMG-SRC:NAME=USER_PROFILE-->
+        <img class="post__account__img" />
+        <div class="username">
+            <!--[DYNAMIC]INSERT:NAME=USER_NAME-->
+        </div>
+    </div>
+    <div class="gallery">
+        <!--[DYNAMIC]INSERT-USER-FEEDS:NAME=USER_FEEDS-->
+    </div>
+</div>
+</body>
+</html>

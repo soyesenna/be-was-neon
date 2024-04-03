@@ -2,19 +2,15 @@ package request.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import request.RequestReader;
 import request.data.HttpRequest;
 import request.util.constant.RequestKeys;
 import utils.ContentType;
 import utils.HTTPMethods;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.security.cert.CRL;
 import java.util.*;
 
 import static request.util.constant.RequestKeys.*;
-import static utils.StringUtils.CRLF;
 
 public class RequestParser {
 
@@ -42,6 +38,8 @@ public class RequestParser {
                 request.addCookie(mappingRequest.get(RequestKeys.COOKIE));
             }
 
+            logger.debug("url has query : " + request.urlHasQuery());
+
             //url 쿼리문이 있을경우
             if (request.urlHasQuery()) {
                 String urlWithQuery = request.getURL();
@@ -50,6 +48,7 @@ public class RequestParser {
                 request.setUrl(url);
                 while (st.hasMoreTokens()) {
                     String nowQuery = st.nextToken();
+                    logger.debug(nowQuery);
                     String[] tmp = nowQuery.split("=");
                     request.addQuery(tmp[0], tmp[1]);
                 }

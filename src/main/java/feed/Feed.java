@@ -44,6 +44,10 @@ public class Feed {
         this.comments.add(comment);
     }
 
+    public boolean isUploader(User user) {
+        return uploader.equals(user);
+    }
+
     public List<Comment> getComments() {
         return Collections.unmodifiableList(this.comments);
     }

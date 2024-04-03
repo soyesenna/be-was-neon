@@ -40,7 +40,9 @@ public class FileProcessor {
     @ResponseStatus(HttpStatus.OK)
     public void responseFile(HttpRequest request, HttpResponse response) {
         logger.debug("ResponseFile Call");
-        if (request.getURL().contains("/feed_image") || request.getURL().contains("/user_profile_img")) response.setBody("." + request.getURL());
+        if (request.getURL().contains("/feed_image") || request.getURL().contains("/user_profile_img")) {
+            response.setBody("." + request.getURL());
+        }
         else response.setBody(STATIC_RESOURCES + request.getURL());
     }
 
@@ -52,7 +54,7 @@ public class FileProcessor {
         if (findUser != null) {
             logger.debug("login welcome page");
 
-            response.addAttribute("USER_NAME", String.format(ProcessorUtil.WELCOME_USER_NAME, findUser.getName()));
+            response.addAttribute("USER_NAME", findUser.getName());
             if (findUser.hasProfileImage()) {
                 response.addAttribute("USER_PROFILE", findUser.getProfileImgPath());
             }
@@ -112,7 +114,9 @@ public class FileProcessor {
     }
 
     private void setFeed(HttpResponse response, Feed feed) {
+        User userByName = Database.findUserByName(feed.getUploaderName());
         response.addAttribute("POST_USER_NAME", feed.getUploaderName());
+        response.addAttribute("POST_USER_PROFILE", userByName.getProfileImgPath());
         response.addAttribute("FEED_IMG", feed.getImagePath());
         response.addAttribute("CONTENT", feed.getContents());
         response.addAttribute("COMMENT", feed.getComments());

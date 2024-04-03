@@ -17,6 +17,8 @@ import response.util.HttpStatus;
 import utils.Paths;
 
 import java.io.ByteArrayOutputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static model.UserFiled.*;
@@ -83,7 +85,7 @@ public class UserProcessor {
             String userSessionId = UUID.randomUUID().toString();
             //session에 추가
             Session.addSession(userSessionId, userById);
-            response.addAttribute("USER_NAME", String.format(ProcessorUtil.WELCOME_USER_NAME, userById.getName()));
+            response.addAttribute("USER_NAME", userById.getName());
 
             response.setStatus302Found("/");
             response.setSidCookie(userSessionId);
@@ -144,7 +146,7 @@ public class UserProcessor {
             response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
         }else {
             response.setStatus200OK();
-            response.addAttribute("USER_NAME", String.format(ProcessorUtil.WELCOME_USER_NAME, user.getName()));
+            response.addAttribute("USER_NAME", user.getName());
             response.setBody(TEMPLATE_PATH + request.getURL() + DEFAULT_FILE);
         }
     }
@@ -155,7 +157,7 @@ public class UserProcessor {
 
         //로그인 되어있지 않을때 로그인페이지로 이동
         if (user == null) {
-            response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
+            response.setJsonBody("redirectUrl", ProcessorUtil.LOGIN_PAGE);
         }else {
             Map<String, String> body = request.getBody();
             String newName = body.get("name");
@@ -169,6 +171,39 @@ public class UserProcessor {
 
             response.setStatus200OK();
             response.setJsonBody("redirectUrl", "/");
+        }
+    }
+
+    @GetMapping("/profile")
+    @ResponseStatus(HttpStatus.OK)
+    public void userProfileAndFeeds(HttpRequest request, HttpResponse response) {
+        User user = ProcessorUtil.getUserByCookieInSession(request);
+
+        //로그인 되어있지 않을때 로그인페이지로 이동
+        if (user == null) {
+            response.setJsonBody("redirectUrl", ProcessorUtil.LOGIN_PAGE);
+        }else {
+            response.addAttribute("NOW_USER_PROFILE", user.getProfileImgPath());
+            response.addAttribute("NOW_USER_NAME", user.getName());
+
+            String userName = request.getQueryValue("userName");
+            logger.debug("profile username :  " + userName);
+            //이름으로 유저 찾음
+            //중복되지 않게 정책을 설정했으므로 괜찮음
+            User findUser = Database.findUserByName(URLDecoder.decode(userName, StandardCharsets.UTF_8));
+            response.addAttribute("USER_NAME", findUser.getName());
+            //프로필 사진이 있는경우 보여주고 아니면 기본 프로필
+            if (findUser.hasProfileImage()) {
+                response.addAttribute("USER_PROFILE", findUser.getProfileImgPath());
+            }
+            //피드 보여줌
+            response.addAttribute("USER_FEEDS", Database.getSpecificUserFeeds(findUser));
+
+            //로그인된 자신이 프로필을 보는경우 프로필 설정 버튼 동적으로 추가해줌
+            if (user.equals(findUser)) {
+                response.addAttribute("SETTING", "");
+            }
+            response.setBody(TEMPLATE_PATH + "/user/profile" + DEFAULT_FILE);
         }
     }
 

@@ -49,7 +49,7 @@ public class FeedProcessor {
             if (user.hasProfileImage()) {
                 response.addAttribute("USER_PROFILE", user.getProfileImgPath());
             }
-            response.addAttribute("USER_NAME", String.format(ProcessorUtil.WELCOME_USER_NAME, user.getName()));
+            response.addAttribute("USER_NAME", user.getName());
             response.setBody(TEMPLATE_PATH + request.getURL() + DEFAULT_FILE);
         }
     }
@@ -107,7 +107,7 @@ public class FeedProcessor {
                 logger.error("잘못된 쿼리 형식입니다");
                 return;
             }
-            response.addAttribute("USER_NAME", String.format(ProcessorUtil.WELCOME_USER_NAME, user.getName()));
+            response.addAttribute("USER_NAME", user.getName());
             //feedId라는 쿠키를 저장하여 피드를 구분함
             response.setCookie("feedId", String.valueOf(feedNum));
             response.setBody(STATIC_RESOURCES + "/comment" + DEFAULT_FILE);

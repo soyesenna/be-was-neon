@@ -1,6 +1,7 @@
 package response.util.dynamic;
 
 import feed.Comment;
+import feed.Feed;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +91,12 @@ public class DynamicHtmlResolver {
             } else if (order.contentEquals(ORDER_REPLACE_IMG_SRC)) {
                 logger.debug("REPLACE IMG SRC PROCESS");
                 result = replaceImgSrc();
+            } else if (order.contentEquals(ORDER_INSERT_USER_FEEDS)) {
+                logger.debug("INSERT USER FEEDS PROCESS");
+                result = insertUserFeeds();
+            } else if (order.contentEquals(ORDER_INSERT_SETTING_BTN)) {
+                logger.debug("INSERT SETTING BTN PROCESS");
+                result = insertSettingBtn();
             }
         } catch (NoSuchMethodException | InvocationTargetException |IllegalAccessException | IOException e) {
             logger.error(e.getMessage());
@@ -107,6 +114,41 @@ public class DynamicHtmlResolver {
             String[] tmp = now.split("=");
             dataMapping.put(tmp[0], tmp[1]);
         }
+    }
+
+    private String insertSettingBtn() {
+        Object roughData = attributes.get(dataMapping.get(NAME_FILED));
+        if (roughData == null) return "";
+
+        StringBuilder html = new StringBuilder();
+        html.append("<a class=\"btn btn_ghost btn_size_s\" href=\"/user/setting\">")
+                .append("<img class=\"post__account__img\" src=\"/img/settingImg.png\"/>")
+                .append("</a>");
+        return html.toString();
+    }
+
+    private String insertUserFeeds() {
+        Object roughData = attributes.get(dataMapping.get(NAME_FILED));
+        if (roughData == null) return "";
+
+        Map<Integer, Feed> feeds = new HashMap<>();
+
+        //동적으로 생성해야하는 타입과 주어진 타입이 일치하는지 검사
+        if (roughData instanceof Map) {
+            Map<Object, Object> convetMap = (Map<Object, Object>) roughData;
+            for (Object rough : convetMap.keySet()) {
+                feeds.put((Integer) rough, (Feed) convetMap.get(rough));
+            }
+        } else throw new IllegalArgumentException("INSERT-USER-FEEDS 명령은 Map 타입만 가질 수 있습니다");
+
+        StringBuilder html = new StringBuilder();
+        for (Integer feedIdx : feeds.keySet()) {
+            logger.debug(feeds.get(feedIdx).getImagePath());
+            html.append("<div class=\"img-wrapper\">");
+            html.append("<a href=\"/?page=").append(feedIdx).append("\">");
+            html.append("<img src=\"").append(feeds.get(feedIdx).getImagePath()).append("\"></a></div>");
+        }
+        return html.toString();
     }
 
     private String replaceImgSrc() throws IOException {

@@ -19,7 +19,6 @@ public class ProcessorUtil {
     public static final String COOKIE_SESSION_ID = "sid";
     public static final String COOKIE_FEED_NUM = "feedId";
     public static final String LOGIN_PAGE = "/user/login";
-    public static final String WELCOME_USER_NAME = "환영합니다❗  %s  님";
     public static final int NO_FEED_COOKIE = -1;
 
     private ProcessorUtil() {
@@ -98,6 +97,6 @@ public class ProcessorUtil {
             logger.error("이미지를 저장하는데 실패했습니다");
         }
 
-        return imageStoredPath;
+        return imageStoredPath.substring(1);
     }
 }

@@ -4,6 +4,7 @@ import feed.Feed;
 import model.User;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Database {
 
@@ -19,6 +20,13 @@ public class Database {
         return users.get(userId);
     }
 
+    public static User findUserByName(String userName) {
+        Optional<User> findUser = users.values().stream()
+                .filter(user -> user.getName().contentEquals(userName))
+                .findFirst();
+        return findUser.get();
+    }
+
     public static Collection<User> findAll() {
         return users.values();
     }
@@ -29,6 +37,14 @@ public class Database {
 
     public static List<Feed> getAllFeeds() {
         return Collections.unmodifiableList(usersFeed);
+    }
+
+    public static Map<Integer, Feed> getSpecificUserFeeds(User user) {
+        Map<Integer, Feed> feedAndIndex = new HashMap<>();
+        usersFeed.stream()
+                        .filter(feed -> feed.isUploader(user))
+                .forEach(feed -> feedAndIndex.put(usersFeed.indexOf(feed), feed));
+        return feedAndIndex;
     }
 
     public static boolean isIdExist(String id) {

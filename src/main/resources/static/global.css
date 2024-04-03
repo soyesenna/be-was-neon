@@ -67,6 +67,14 @@
   color: #ffffff;
 }
 
+.btn_green {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 14px;
+  background: #339900;
+  color: #ffffff;
+}
+
 .btn_size_s {
   padding: 8px 16px;
   font-size: 14px;
@@ -85,6 +93,15 @@
   line-height: 14px;
   background: #aaaaaa;
   color: #ffffff;
+}
+
+.btn_user_profile{
+  display: flex;
+  padding: 16px;
+  font-size: 16px;
+  line-height: 14px;
+  align-items: center;
+  gap: 8px;
 }
 
 .form {

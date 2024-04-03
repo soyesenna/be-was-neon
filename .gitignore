@@ -203,3 +203,4 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/gradle,intellij,java,macos
 
 src/main/resources/feed_image
+src/main/resources/user_profile_img
