@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="../reset.css" rel="stylesheet" />
-    <link href="../global.css" rel="stylesheet" />
+    <link href="/reset.css" rel="stylesheet" />
+    <link href="/global.css" rel="stylesheet" />
   </head>
   <body>
     <div class="container">
       <header class="header">
-        <a href="/"><img src="../img/signiture.svg" /></a>
+        <a href="/"><img src="/img/signiture.svg" /></a>
         <ul class="header__menu">
           <li class="header__menu__item">
             <!--[DYNAMIC]INSERT:NAME=USER_NAME-->
@@ -32,6 +32,8 @@
               class="input_textfield"
               placeholder="글의 내용을 입력하세요"
               autocomplete="username"
+              id="comment-area"
+              required
             ></textarea>
           </div>
           <button
@@ -39,11 +41,42 @@
             class="btn btn_contained btn_size_m"
             style="margin-top: 24px"
             type="submit"
+            onclick="submitComment()"
           >
             작성 완료
           </button>
         </form>
       </div>
     </div>
+  <script>
+    function submitComment(){
+      var commentContents = document.getElementById("comment-area").value;
+      <!--[DYNAMIC]REPLACE_JS_VAR:NAME=FEED_NUM-->
+      var feedNum = -1;
+      var json = {
+        comment : commentContents,
+        feed: feedNum
+      }
+
+      fetch('/feed/comment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(json)
+      })
+              .then(response => {
+                if (response.ok) {
+                  return response.json(); // 서버로부터 응답 받기
+                }
+                throw new Error('Network response was not ok.');
+              })
+              .then(data => {
+                // 서버가 리디렉트 URL을 응답 데이터로 보내주는 경우
+                window.location.href = data.redirectUrl; // 여기에서는 서버로부터 받은 리디렉트 URL을 사용
+              })
+              .catch(error => console.error('There was a problem with the fetch operation:', error));
+    }
+  </script>
   </body>
 </html>

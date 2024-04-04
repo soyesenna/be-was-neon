@@ -108,37 +108,31 @@ public class FeedProcessor {
                 return;
             }
             response.addAttribute("USER_NAME", user.getName());
-            //feedId라는 쿠키를 저장하여 피드를 구분함
-            response.setCookie("feedId", String.valueOf(feedNum));
-            response.setBody(STATIC_RESOURCES + "/comment" + DEFAULT_FILE);
+            response.addAttribute("FEED_NUM", String.valueOf(feedNum));
+
+            response.setBody(TEMPLATE_PATH + "/comment" + DEFAULT_FILE);
         }
     }
 
     @PostMapping("/comment")
     public void commentWrite(HttpRequest request, HttpResponse response) {
         User user = ProcessorUtil.getUserByCookieInSession(request);
-        int feedNum = ProcessorUtil.getFeedNumByCookieInSession(request);
 
         if (user == null) {
             response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
             return;
-        }
-        if (feedNum == ProcessorUtil.NO_FEED_COOKIE) {
-            response.setStatus302Found("/");
         } else {
             //댓글이 달릴 피드를 가져옴
             List<Feed> feeds = Database.getAllFeeds();
-            Feed nowFeed = feeds.get(feedNum);
-
             Map<String, String> body = request.getBody();
             String comment = body.get("comment");
+            int feedNum = Integer.parseInt(body.get("feed"));
+
+            Feed nowFeed = feeds.get(feedNum);
 
             nowFeed.addComment(new Comment(user, comment));
 
-            response.setStatus302Found("/");
+            response.setJsonBody("redirectUrl", "/");
         }
-
-        //댓글 작성이 완료되었으므로 feedId쿠키 삭제
-        response.deleteCookie("feedId", String.valueOf(feedNum));
     }
 }

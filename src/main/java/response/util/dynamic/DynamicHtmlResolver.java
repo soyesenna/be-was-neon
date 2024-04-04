@@ -97,6 +97,9 @@ public class DynamicHtmlResolver {
             } else if (order.contentEquals(ORDER_INSERT_SETTING_BTN)) {
                 logger.debug("INSERT SETTING BTN PROCESS");
                 result = insertSettingBtn();
+            } else if (order.contentEquals(ORDER_REPLACE_JS_VAR)) {
+                logger.debug("REPLACE JS VAR PROCESS");
+                result = replaceJSVar();
             }
         } catch (NoSuchMethodException | InvocationTargetException |IllegalAccessException | IOException e) {
             logger.error(e.getMessage());
@@ -114,6 +117,22 @@ public class DynamicHtmlResolver {
             String[] tmp = now.split("=");
             dataMapping.put(tmp[0], tmp[1]);
         }
+    }
+
+    private String replaceJSVar() throws IOException{
+        Object roughData = attributes.get(dataMapping.get(NAME_FILED));
+        if (roughData == null) return "";
+        String replaceValue = (String) roughData;
+
+        String replaceLine = fileReader.readLine();
+        StringTokenizer st = new StringTokenizer(replaceLine, "=");
+
+        StringBuilder html = new StringBuilder();
+        html.append(st.nextToken()).append("=");
+
+        html.append("\'").append(replaceValue).append("\';");
+
+        return html.toString();
     }
 
     private String insertSettingBtn() {

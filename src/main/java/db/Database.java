@@ -23,9 +23,8 @@ public class Database {
 
     public static User findUserByName(String userName) {
         Optional<User> findUser = users.values().stream()
-                .filter(user -> {
-                    return URLDecoder.decode(user.getName(), StandardCharsets.UTF_8).equals(URLDecoder.decode(userName, StandardCharsets.UTF_8));
-                })
+                .filter(user ->
+                    URLDecoder.decode(user.getName(), StandardCharsets.UTF_8).equals(URLDecoder.decode(userName, StandardCharsets.UTF_8)))
                 .findFirst();
         return findUser.get();
     }

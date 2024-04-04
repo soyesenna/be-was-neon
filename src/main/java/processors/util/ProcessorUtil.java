@@ -47,21 +47,6 @@ public class ProcessorUtil {
         }
     }
 
-    public static int getFeedNumByCookieInSession(HttpRequest request) {
-        if (request.getCookie().isEmpty()) return NO_FEED_COOKIE;
-        if (!request.getCookie().containsKey(COOKIE_FEED_NUM)) return NO_FEED_COOKIE;
-
-        String feedId = request.getCookie().get(COOKIE_FEED_NUM);
-        int feedNum = NO_FEED_COOKIE;
-        try {
-            feedNum = Integer.parseInt(feedId);
-        } catch (NumberFormatException e) {
-            logger.error("잘못된 쿠키입니다");
-        }
-
-        return feedNum;
-    }
-
     public static String storeImage(User user, String image, String imageType, String dir, boolean duplicateSave) {
         String hash = String.valueOf(user.hashCode());
         byte[] decodedImage = Base64.getDecoder().decode(image);

@@ -13,6 +13,7 @@ public class Orders {
     public static final String ORDER_REPLACE_IMG_SRC = "REPLACE-IMG-SRC";
     public static final String ORDER_INSERT_USER_FEEDS = "INSERT-USER-FEEDS";
     public static final String ORDER_INSERT_SETTING_BTN = "INSERT-SETTING";
+    public static final String ORDER_REPLACE_JS_VAR = "REPLACE_JS_VAR";
     private Orders() {
 
     }
