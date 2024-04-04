@@ -3,8 +3,9 @@ package db;
 import feed.Feed;
 import model.User;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Database {
 
@@ -22,7 +23,9 @@ public class Database {
 
     public static User findUserByName(String userName) {
         Optional<User> findUser = users.values().stream()
-                .filter(user -> user.getName().contentEquals(userName))
+                .filter(user -> {
+                    return URLDecoder.decode(user.getName(), StandardCharsets.UTF_8).equals(URLDecoder.decode(userName, StandardCharsets.UTF_8));
+                })
                 .findFirst();
         return findUser.get();
     }
@@ -56,7 +59,8 @@ public class Database {
 
     public static boolean isNameExist(String Name) {
         for (User user : users.values()) {
-            if (user.getName().equalsIgnoreCase(Name)) return true;
+            if (URLDecoder.decode(user.getName(), StandardCharsets.UTF_8).equals(URLDecoder.decode(Name, StandardCharsets.UTF_8)))
+                return true;
         }
         return false;
     }

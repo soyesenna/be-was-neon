@@ -61,7 +61,7 @@ public class User {
     public boolean equals(Object obj) {
         if (obj instanceof User) {
             User user = (User) obj;
-            return this.userId.equals(user.userId) && this.password.equals(user.password) && this.email.equals(user.email) && this.name.equals(user.name);
+            return this.userId.equals(user.userId) && this.password.equals(user.password) && this.email.equals(user.email);
         }
         return false;
     }

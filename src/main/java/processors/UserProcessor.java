@@ -17,6 +17,7 @@ import response.util.HttpStatus;
 import utils.Paths;
 
 import java.io.ByteArrayOutputStream;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -190,7 +191,9 @@ public class UserProcessor {
             logger.debug("profile username :  " + userName);
             //이름으로 유저 찾음
             //중복되지 않게 정책을 설정했으므로 괜찮음
-            User findUser = Database.findUserByName(URLDecoder.decode(userName, StandardCharsets.UTF_8));
+            User findUser = Database.findUserByName(userName);
+            logger.debug("findUser : ", findUser.getName());
+
             response.addAttribute("USER_NAME", findUser.getName());
             //프로필 사진이 있는경우 보여주고 아니면 기본 프로필
             if (findUser.hasProfileImage()) {

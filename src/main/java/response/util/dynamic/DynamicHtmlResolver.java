@@ -323,7 +323,7 @@ public class DynamicHtmlResolver {
 
         //String attibutes 처리
         insetString = (String) roughData;
-        insetString = URLDecoder.decode(insetString, "UTF-8");
+        insetString = URLDecoder.decode(insetString, StandardCharsets.UTF_8);
 
         return insetString;
     }

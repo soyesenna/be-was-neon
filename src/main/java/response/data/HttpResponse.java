@@ -7,6 +7,7 @@ import response.util.HttpStatus;
 import utils.ContentType;
 
 import java.io.*;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -117,5 +118,13 @@ public class HttpResponse {
 
     public byte[] getBody() {
         return this.body;
+    }
+
+    public String getStatusCode(){
+        return this.status.getCode();
+    }
+
+    public Map<String, Object> getDynamicAttributes() {
+        return Collections.unmodifiableMap(this.dynamicAttributes);
     }
 }

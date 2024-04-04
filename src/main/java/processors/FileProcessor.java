@@ -12,7 +12,6 @@ import property.annotations.ResponseStatus;
 import request.data.HttpRequest;
 import response.data.HttpResponse;
 import response.util.HttpStatus;
-import utils.Paths;
 
 import java.util.List;
 
