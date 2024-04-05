@@ -21,7 +21,7 @@
 
     function getMyProfile() {
       // p태그에서 사용자 이름 가져오기
-      var userName = document.getElementById("my_name").innerText;
+      var userName = document.getElementById("likeButton").innerText;
 
       // URL 구성
       var url = "/user/profile?userName=" + encodeURIComponent(userName);
@@ -29,6 +29,7 @@
       window.location.href = url;
 
     }
+
   </script>
   <body>
     <div class="container">
@@ -66,9 +67,11 @@
           <div class="post__menu">
             <ul class="post__menu__personal">
               <li>
-                <button class="post__menu__btn">
+                <!--[DYNAMIC]REPLACE-HREF:NAME=LIKE_BUTTON-->
+                <a class="btn post__menu__btn" id="likeButton" href="">
+                  <!--[DYNAMIC]REPLACE-IMG-SRC:NAME=LIKE_PRESS_IMG-->
                   <img src="/img/like.svg" />
-                </button>
+                </a>
               </li>
               <li>
                 <button class="post__menu__btn">

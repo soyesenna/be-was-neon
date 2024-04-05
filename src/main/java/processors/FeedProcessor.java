@@ -87,7 +87,6 @@ public class FeedProcessor {
     }
 
 
-
     @GetMapping("/comment")
     @ResponseStatus(HttpStatus.OK)
     public void commentPage(HttpRequest request, HttpResponse response) {
@@ -96,7 +95,7 @@ public class FeedProcessor {
 
         if (user == null) {
             response.setBody(ProcessorUtil.LOGIN_PAGE);
-        }else {
+        } else {
             int feedNum = -1;
             List<Feed> feeds = Database.getAllFeeds();
             try {
@@ -120,7 +119,6 @@ public class FeedProcessor {
 
         if (user == null) {
             response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
-            return;
         } else {
             //댓글이 달릴 피드를 가져옴
             List<Feed> feeds = Database.getAllFeeds();
@@ -133,6 +131,31 @@ public class FeedProcessor {
             nowFeed.addComment(new Comment(user, comment));
 
             response.setJsonBody("redirectUrl", "/");
+        }
+    }
+
+    @GetMapping("/like")
+    public void likeFeed(HttpRequest request, HttpResponse response) {
+        User user = ProcessorUtil.getUserByCookieInSession(request);
+
+        if (user == null) {
+            response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
+        } else {
+            int feedNum = -1;
+            List<Feed> feeds = Database.getAllFeeds();
+            try {
+                //쿼리가 잘 들어왔는지 검사
+                feedNum = Integer.parseInt(request.getQueryValue(QUERY_KEY_FEED));
+                feeds.get(feedNum);
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                logger.error("잘못된 쿼리 형식입니다");
+                return;
+            }
+            Feed nowFeed = feeds.get(feedNum);
+
+            nowFeed.addLikeUser(user);
+
+            response.setStatus302Found("/");
         }
     }
 }

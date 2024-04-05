@@ -6,6 +6,7 @@ import utils.ContentType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class Feed {
 
@@ -14,6 +15,7 @@ public class Feed {
     private String imagePath;
     private ContentType imageType;
     private List<Comment> comments = new ArrayList<>();
+    private List<User> likeUsers = new ArrayList<>();
 
     public Feed(User uploader, String imagePath, ContentType imageType) {
         this.uploader = uploader;
@@ -50,6 +52,16 @@ public class Feed {
 
     public List<Comment> getComments() {
         return Collections.unmodifiableList(this.comments);
+    }
+    public boolean isUserLikeThisFeed(User user) {
+        Optional<User> optionalUser = likeUsers.stream()
+                .filter(user1 -> user1.equals(user))
+                .findAny();
+        return optionalUser.isPresent();
+    }
+
+    public void addLikeUser(User user) {
+        this.likeUsers.add(user);
     }
 
 

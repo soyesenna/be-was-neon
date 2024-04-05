@@ -68,7 +68,7 @@ public class FileProcessor {
 
             int requestFeedNum = getNowFeed(request);
             //요청한 피드를 보여준다
-            setFeed(response, feeds.get(requestFeedNum));
+            setFeed(response, feeds.get(requestFeedNum), findUser);
 
             //동적으로 href들 설정
             setDynamicHref(response, requestFeedNum, feeds.size());
@@ -87,7 +87,7 @@ public class FileProcessor {
         if (requestFeedNum < feedCount - 1) {
             addPageHref(response, "NEXT_PAGE", requestFeedNum + 1);
         }
-        //이전 페이지 href 설정
+        //이전 페이지 href 설정®
         //현재 페이지가 0일 경우는 변경하지 않음
         if (requestFeedNum > 0) {
             addPageHref(response, "PREV_PAGE", requestFeedNum - 1);
@@ -96,6 +96,11 @@ public class FileProcessor {
         //댓글은 피드에 속하므로 현재 피드 정보를 주어야함
         String commentHref = "/feed/comment?feed=" + requestFeedNum;
         response.addAttribute("COMMENT_BY_FEED", commentHref);
+
+        //좋아요 href설정
+        String likeHref = "/feed/like?feed=" + requestFeedNum;
+        response.addAttribute("LIKE_BUTTON", likeHref);
+
     }
 
     private int getNowFeed(HttpRequest request) {
@@ -112,13 +117,16 @@ public class FileProcessor {
         return requestFeedNum;
     }
 
-    private void setFeed(HttpResponse response, Feed feed) {
+    private void setFeed(HttpResponse response, Feed feed, User nowUser) {
         User userByName = Database.findUserByName(feed.getUploaderName());
         response.addAttribute("POST_USER_NAME", feed.getUploaderName());
         response.addAttribute("POST_USER_PROFILE", userByName.getProfileImgPath());
         response.addAttribute("FEED_IMG", feed.getImagePath());
         response.addAttribute("CONTENT", feed.getContents());
         response.addAttribute("COMMENT", feed.getComments());
+        if (feed.isUserLikeThisFeed(nowUser)) {
+            response.addAttribute("LIKE_PRESS_IMG", "/img/like_press.svg");
+        }
     }
 
     private void addPageHref(HttpResponse response, String name, int page) {
