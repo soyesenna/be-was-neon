@@ -30,6 +30,14 @@
 
     }
 
+    function copyTextToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert("피드 주소가 복사되었습니다");
+      }, (err) => {
+        console.error("Failed to copy text: ", err);
+      });
+    }
+
   </script>
   <body>
     <div class="container">
@@ -74,9 +82,11 @@
                 </a>
               </li>
               <li>
-                <button class="post__menu__btn">
+                <a class="btn post__menu__btn" onclick="copyTextToClipboard(
+                        <!--[DYNAMIC]INSERT:NAME=FEED_IDX-->
+                        )">
                   <img src="/img/sendLink.svg" />
-                </button>
+                </a>
               </li>
             </ul>
             <button class="post__menu__btn">

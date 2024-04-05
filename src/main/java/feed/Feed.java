@@ -64,5 +64,9 @@ public class Feed {
         this.likeUsers.add(user);
     }
 
+    public void cancelLikeUser(User user) {
+        this.likeUsers.remove(user);
+    }
+
 
 }

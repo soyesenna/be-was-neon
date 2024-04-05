@@ -73,6 +73,9 @@ public class FileProcessor {
             //동적으로 href들 설정
             setDynamicHref(response, requestFeedNum, feeds.size());
 
+            //공유버튼 클립보드 복사를 위한 복사될 주소 설정
+            response.addAttribute("FEED_IDX", "'http://localhost:8080/?page=" + requestFeedNum + "'");
+
             response.setStatus200OK();
             response.setBody(TEMPLATE_PATH + "/main" + DEFAULT_FILE);
         } else {

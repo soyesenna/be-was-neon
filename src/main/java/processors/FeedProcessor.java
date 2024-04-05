@@ -153,7 +153,8 @@ public class FeedProcessor {
             }
             Feed nowFeed = feeds.get(feedNum);
 
-            nowFeed.addLikeUser(user);
+            if (nowFeed.isUserLikeThisFeed(user)) nowFeed.cancelLikeUser(user);
+            else nowFeed.addLikeUser(user);
 
             response.setStatus302Found("/");
         }
