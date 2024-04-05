@@ -223,4 +223,23 @@ public class UserProcessor {
             response.setBody(TEMPLATE_PATH + "/user_list.html");
         }
     }
+
+    @GetMapping("/bookmark_list")
+    public void bookMarkFeeds(HttpRequest request, HttpResponse response) {
+        User user = ProcessorUtil.getUserByCookieInSession(request);
+
+        if (user == null) {
+            response.setStatus302Found(ProcessorUtil.LOGIN_PAGE);
+        } else {
+            //프로필 사진이 있는경우 보여주고 아니면 기본 프로필
+            if (user.hasProfileImage()) {
+                response.addAttribute("NOW_USER_PROFILE", user.getProfileImgPath());
+            }
+            response.addAttribute("NOW_USER_NAME", user.getName());
+            response.addAttribute("BOOK_MARK_USER_FEEDS", Database.getBookMarkFeeds(user));
+
+            response.setBody(TEMPLATE_PATH + "/user/bookmark_list" + DEFAULT_FILE);
+        }
+    }
+
 }

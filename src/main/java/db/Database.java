@@ -64,5 +64,13 @@ public class Database {
         return false;
     }
 
+    public static Map<Integer, Feed> getBookMarkFeeds(User user) {
+        Map<Integer, Feed> feedAndIndex = new HashMap<>();
+        usersFeed.stream()
+                .filter(feed -> feed.isUserBookMarkThisFeed(user))
+                .forEach(feed -> feedAndIndex.put(usersFeed.indexOf(feed), feed));
+        return feedAndIndex;
+    }
+
 
 }

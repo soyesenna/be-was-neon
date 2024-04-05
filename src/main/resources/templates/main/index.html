@@ -21,7 +21,7 @@
 
     function getMyProfile() {
       // p태그에서 사용자 이름 가져오기
-      var userName = document.getElementById("likeButton").innerText;
+      var userName = document.getElementById("my_name").innerText;
 
       // URL 구성
       var url = "/user/profile?userName=" + encodeURIComponent(userName);
@@ -50,6 +50,11 @@
           </li>
           <li class="header__menu__item" id="my_name">
           <!--[DYNAMIC]INSERT:NAME=USER_NAME-->
+          </li>
+          <li class="header__menu__item">
+            <a class="post" href="/user/bookmark_list">
+              <img class="post__account__img" src="/img/bookmark_signiture.png" />
+            </a>
           </li>
           <li class="header__menu__item">
             <a class="btn btn_contained btn_size_s" href="/feed">피드 만들기</a>
@@ -89,9 +94,11 @@
                 </a>
               </li>
             </ul>
-            <button class="post__menu__btn">
+            <!--[DYNAMIC]REPLACE-HREF:NAME=BOOKMARK_BTN-->
+            <a class="btn post__menu__btn" id="bookMarkBtn" href="">
+              <!--[DYNAMIC]REPLACE-IMG-SRC:NAME=BOOKMARK_PRESS_IMG-->
               <img src="/img/bookMark.svg" />
-            </button>
+            </a>
           </div>
           <!--[DYNAMIC]INSERT-ARTICLE:NAME=CONTENT-->
         <ul class="comment">

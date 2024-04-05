@@ -16,6 +16,7 @@ public class Feed {
     private ContentType imageType;
     private List<Comment> comments = new ArrayList<>();
     private List<User> likeUsers = new ArrayList<>();
+    private List<User> bookmarkUsers = new ArrayList<>();
 
     public Feed(User uploader, String imagePath, ContentType imageType) {
         this.uploader = uploader;
@@ -66,6 +67,21 @@ public class Feed {
 
     public void cancelLikeUser(User user) {
         this.likeUsers.remove(user);
+    }
+
+    public boolean isUserBookMarkThisFeed(User user) {
+        Optional<User> optionalUser = bookmarkUsers.stream()
+                .filter(user1 -> user1.equals(user))
+                .findAny();
+        return optionalUser.isPresent();
+    }
+
+    public void addBookMarkUser(User user) {
+        this.bookmarkUsers.add(user);
+    }
+
+    public void removeBookMarkUser(User user) {
+        this.bookmarkUsers.remove(user);
     }
 
 

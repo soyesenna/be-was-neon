@@ -90,7 +90,7 @@ public class FileProcessor {
         if (requestFeedNum < feedCount - 1) {
             addPageHref(response, "NEXT_PAGE", requestFeedNum + 1);
         }
-        //이전 페이지 href 설정®
+        //이전 페이지 href 설정
         //현재 페이지가 0일 경우는 변경하지 않음
         if (requestFeedNum > 0) {
             addPageHref(response, "PREV_PAGE", requestFeedNum - 1);
@@ -104,6 +104,9 @@ public class FileProcessor {
         String likeHref = "/feed/like?feed=" + requestFeedNum;
         response.addAttribute("LIKE_BUTTON", likeHref);
 
+        //북마크 href설정
+        String bookMarkHref = "/feed/bookmark?feed=" + requestFeedNum;
+        response.addAttribute("BOOKMARK_BTN", bookMarkHref);
     }
 
     private int getNowFeed(HttpRequest request) {
@@ -129,6 +132,9 @@ public class FileProcessor {
         response.addAttribute("COMMENT", feed.getComments());
         if (feed.isUserLikeThisFeed(nowUser)) {
             response.addAttribute("LIKE_PRESS_IMG", "/img/like_press.svg");
+        }
+        if (feed.isUserBookMarkThisFeed(nowUser)) {
+            response.addAttribute("BOOKMARK_PRESS_IMG", "/img/bookMark_press.svg");
         }
     }
 
